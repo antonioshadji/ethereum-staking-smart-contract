@@ -7,7 +7,6 @@
     "test": "test"
   },
   "scripts": {
-    "dev": "lite-server",
     "test": "mocha"
   },
   "keywords": [
@@ -16,11 +15,6 @@
   ],
   "author": "Antonios Hadjigeorgalis <Antonios@Hadji.co> (https://antonioshadji.github.io/)",
   "license": "MIT",
-  "devDependencies": {
-    "debug": ^"3.1.0",
-    "lodash": ^"4.17.10",
-    "lite-server": ^"2.4.0"
-  },
-  "dependencies": {
-  }
+  "devDependencies": {},
+  "dependencies": {}
 }
