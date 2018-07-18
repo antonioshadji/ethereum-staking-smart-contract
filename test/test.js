@@ -1,5 +1,5 @@
-let describe = require('mocha').describe
-let it = require('mocha').it
+// let describe = require('mocha').describe
+// let it = require('mocha').it
 let assert = require('chai').assert
 
 // An arrow function expression has a shorter syntax than a function expression
