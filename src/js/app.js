@@ -57,11 +57,3 @@ const App = {
   }
 
 }
-
-// window waits for everything to load, not just DOM
-// $( window ).on( 'load', readyFn )
-// Shorthand for $( document ).ready()
-$(function () {
-  console.log('$ ready!')
-  App.init()
-})
