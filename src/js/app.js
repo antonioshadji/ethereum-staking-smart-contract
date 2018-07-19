@@ -1,4 +1,5 @@
 /* global $, web3, Web3 */
+const rpcurl = 'http://127.0.0.1:7545'
 
 const App = {
 
@@ -17,16 +18,16 @@ const App = {
       if (web3.currentProvider.isMetaMask) {
         console.log('Metamask detected')
       } else {
-        console.log('found web3')
+        console.log('Metamask not detected, found other web3')
       }
       App.web3Provider = web3.currentProvider
     } else {
       // If no injected web3 instance is detected, fall back to Ganache
       // TODO: verify correct server for testing
-      console.log('create web3')
+      console.log('create new web3')
       // use 127.0.0.1 is better than localhost (no network access required)
       // https://truffleframework.com/docs/advanced/truffle-with-metamask#using-metamask-with-truffle-develop
-      App.web3Provider = new Web3.providers.HttpProvider('http://127.0.0.1:7545')
+      App.web3Provider = new Web3.providers.HttpProvider(rpcurl)
       // global assignment on purpose
     }
     // define global web3 with provider
@@ -42,12 +43,17 @@ const App = {
     web3.eth.getAccounts().then((result) => {
       // 'this' is App object same as function getActiveAccount
       console.log('Promise value: ', result)
-      App.account = result[0]
-      $('h1').first().text('Hello Ethereum: ' + App.account)
+      App.updateAccount(result[0])
+      // this must be here for sequence
     }).catch((reason) => {
       // Log the rejection reason
       console.log('Handle rejected promise (' + reason + ') here.')
     })
+  },
+
+  updateAccount: function (acct) {
+    App.account = acct
+    $('h1').first().text('Hello Ethereum: ' + acct)
   }
 
 }
