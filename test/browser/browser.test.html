@@ -14,12 +14,13 @@
 
   <script>mocha.setup('bdd')</script>
   <!-- add library scripts, then test scripts here -->
+  <script src="../../src/js/web3.min.js"></script>
   <script src="../../src/js/app.js"></script>
   <!-- add test scripts -->
   <script src="./browser.test.js"></script>
   <script>
     mocha.checkLeaks()
-    mocha.globals(['jQuery'])
+    mocha.globals(['jQuery', 'web3'])
     mocha.run()
   </script>
 </body>
