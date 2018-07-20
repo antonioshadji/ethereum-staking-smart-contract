@@ -62,4 +62,7 @@ $('#b_refresh').on('click', () => {
   App.getActiveAccount()
 })
 
+$('#i_metamask').on('click', () => {
+  window.location.href = 'https://metamask.io'
+})
 // module.exports = App

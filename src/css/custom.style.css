@@ -18,3 +18,9 @@ body {
   height: 60px;
   background-color: #f0f0f0;
 }
+
+/* id contains js link, use this to make mouse cursor behave as link  */
+#i_metamask
+{
+  cursor: pointer;
+}
