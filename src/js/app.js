@@ -53,9 +53,13 @@ const App = {
 
   updateAccount: function (acct) {
     App.account = acct
-    $('h1').first().text('Hello Ethereum: ' + acct)
+    $('#t_account').text(acct)
   }
 
 }
 
-module.exports = App
+$('#b_refresh').on('click', () => {
+  App.getActiveAccount()
+})
+
+// module.exports = App

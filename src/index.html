@@ -7,15 +7,42 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/custom.style.css">
 
     <title>OMG Staking Pool</title>
   </head>
   <body>
+    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+      <a class="navbar-brand" href="#">Staking Pool</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+          </li>
+        </ul>
+        <button id="b_refresh" class="btn btn-primary" type="submit">Refresh Account</button>
+        <span id="t_account" class="navbar-text ml-2">
+          Unlock MetaMask
+        </span>
+      </div>
+    </nav>
+
     <div class="container">
       <div class="row">
         <h1>Hello, world!</h1>
       </div>
-    </div>
+    </div> <!-- end container -->
+
+    <footer class="footer">
+      <div class="container">
+        &copy; Copyright <script type="text/javascript">document.write(new Date().getFullYear())</script>
+        Leros Capital LLC
+      </div>
+    </footer>
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js (included in bootstrap bundle), then Bootstrap JS -->
     <script src="js/jquery-3.3.1.min.js"></script>
@@ -23,13 +50,13 @@
     <script src="js/web3.min.js"></script>
     <script src="js/app.js"></script>
     <script>
-    // window waits for everything to load, not just DOM
-    // $( window ).on( 'load', readyFn )
-    // Shorthand for $( document ).ready()
-    $(function () {
-      console.log('$ ready!')
-      App.init()
-    })
+      // window waits for everything to load, not just DOM
+      // $( window ).on( 'load', readyFn )
+      // Shorthand for $( document ).ready()
+      $(function () {
+        console.log('$ ready!')
+        App.init()
+      })
     </script>
   </body>
 </html>
