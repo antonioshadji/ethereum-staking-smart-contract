@@ -54,6 +54,19 @@ const App = {
   updateAccount: function (acct) {
     App.account = acct
     $('#t_account').text(acct)
+  },
+
+  sendEther: function (value, target) {
+    web3.eth.sendTransaction({
+      from: App.account,
+      to: target,
+      value: web3.utils.toWei(value, 'ether')
+    }).then((result) => {
+      console.log('Promise value: ', result)
+    }).catch((reason) => {
+      // Log the rejection reason
+      console.log('Handle rejected promise (' + reason + ') here.')
+    })
   }
 
 }
@@ -65,4 +78,9 @@ $('#b_refresh').on('click', () => {
 $('#i_metamask').on('click', () => {
   window.location.href = 'https://metamask.io'
 })
+
+$('#b_trx').on('click', () => {
+  App.sendEther('1', '0x5755B9Bf6bf9d4bE8Bb36eCC8D212a3C329899ab')
+})
+
 // module.exports = App
