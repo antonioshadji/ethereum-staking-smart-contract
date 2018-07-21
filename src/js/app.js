@@ -71,16 +71,12 @@ const App = {
 
 }
 
+/* setup related event listeners */
+/* b_ => buttons */
 $('#b_refresh').on('click', () => {
   App.getActiveAccount()
-})
-
-$('#i_metamask').on('click', () => {
-  window.location.href = 'https://metamask.io'
 })
 
 $('#b_trx').on('click', () => {
   App.sendEther('1', '0x5755B9Bf6bf9d4bE8Bb36eCC8D212a3C329899ab')
 })
-
-// module.exports = App
