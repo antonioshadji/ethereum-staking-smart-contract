@@ -1,8 +1,8 @@
 /* global $, web3, Web3 */
-const rpcurl = 'http://127.0.0.1:7545'
 
 const App = {
 
+  rpcurl: 'http://127.0.0.1:7545',
   web3Provider: null,
   contracts: {},
   account: null,
@@ -27,7 +27,7 @@ const App = {
       console.log('create new web3')
       // use 127.0.0.1 is better than localhost (no network access required)
       // https://truffleframework.com/docs/advanced/truffle-with-metamask#using-metamask-with-truffle-develop
-      App.web3Provider = new Web3.providers.HttpProvider(rpcurl)
+      App.web3Provider = new Web3.providers.HttpProvider(App.rpcurl)
       // global assignment on purpose
     }
     // define global web3 with provider
