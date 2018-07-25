@@ -5,6 +5,7 @@ const App = {
   rpcurl: 'http://127.0.0.1:7545',
   web3Provider: null,
   contracts: {},
+  activeInstance: null,
   account: null,
 
   init: function () {
@@ -34,6 +35,7 @@ const App = {
     web3 = new Web3(App.web3Provider) // eslint-disable-line no-global-assign
 
     App.getActiveAccount()
+    App.initContract()
   },
 
   getActiveAccount: function () {
@@ -54,6 +56,22 @@ const App = {
   updateAccount: function (acct) {
     App.account = acct
     $('#t_account').text(acct)
+  },
+
+  initContract: function () {
+    $.getJSON('StakePool.json')
+      .done(function (data) {
+        console.log('DATA: ', data)
+        // instantiate new contract
+        App.contracts.StakePool = new web3.eth.Contract(
+          data.abi,
+          '0xF6BfB9dB4Cd57b8D1a38Dd134827b2da6ea8c5ae')
+      })
+      .fail(function (jqxhr, textStatus, error) {
+        var err = textStatus + ', ' + error
+        // console.log(jqxhr)
+        console.log('Request Failed: ' + err)
+      })
   },
 
   sendEther: function (value, target) {
@@ -78,5 +96,22 @@ $('#b_refresh').on('click', () => {
 })
 
 $('#b_trx').on('click', () => {
-  App.sendEther('1', '0x5755B9Bf6bf9d4bE8Bb36eCC8D212a3C329899ab')
+  // App.sendEther('1', '0x5755B9Bf6bf9d4bE8Bb36eCC8D212a3C329899ab')
+  console.log('click#b_trx')
+  // default account is null
+  // console.log(web3.eth.defaultAccount)
+  App.contracts.StakePool.methods.deposit()
+    .send({from: App.account, value: web3.utils.toWei('1', 'ether')})
+    .on('transactionHash', (hash) => {
+      console.log('trx_Hash: ', hash)
+    })
+    .on('confirmation', (confirmationNumber, receipt) => {
+      // output 24 confirmations ??
+      console.log('Conf: ', confirmationNumber)
+      console.log('receipt: ', receipt)
+    })
+    .on('receipt', (receipt) => {
+      console.log('Receipt: ', receipt)
+    })
+    .on('error', console.error)
 })
