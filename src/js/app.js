@@ -3,7 +3,7 @@
 const App = {
 
   rpcurl: 'http://127.0.0.1:7545',
-  contractAddress: '0xf6bfb9db4cd57b8d1a38dd134827b2da6ea8c5ae',
+  contractAddress: '0xF6BfB9dB4Cd57b8D1a38Dd134827b2da6ea8c5ae',
   web3Provider: null,
   contracts: {},
   activeInstance: null,
@@ -45,23 +45,27 @@ const App = {
     web3.eth.getAccounts().then((result) => {
       // 'this' is App object same as function getActiveAccount
       console.log('Promise value: ', result)
-      App.updateAccount(result[0])
-      // this must be here for sequence
+      return App.updateAccount(result[0])
+    }).then((account) => {
+      console.log(account)
+      if (Object.keys(App.contracts).length === 0) {
+        App.initContract()
+      }
+      App.getBalance()
     }).catch((reason) => {
       // Log the rejection reason
       console.log('Handle rejected promise (' + reason + ') here.')
     })
-
-    App.initContract()
   },
 
   updateAccount: function (acct) {
     App.account = acct
     $('#t_account').text(acct)
+    return App.account
   },
 
   initContract: function () {
-    $.getJSON('StakePool.json')
+    $.getJSON('./js/StakePool.json')
       .done(function (data) {
         console.log('DATA: ', data)
         // instantiate new contract
@@ -69,10 +73,11 @@ const App = {
           data.abi,
           App.contractAddress)
         enableSend()
+        App.getBalance()
       })
       .fail(function (jqxhr, textStatus, error) {
         var err = textStatus + ', ' + error
-        // console.log(jqxhr)
+        console.log(jqxhr)
         console.log('Failed to find Smart Contract: ' + err)
         disableSend()
       })
@@ -89,6 +94,34 @@ const App = {
       // Log the rejection reason
       console.log('Handle rejected promise (' + reason + ') here.')
     })
+  },
+
+  sendTransaction: function (value) {
+    App.contracts.StakePool.methods.deposit()
+      .send({from: App.account, value: web3.utils.toWei(value, 'ether')})
+      .on('transactionHash', (hash) => {
+        console.log('trx_Hash: ', hash)
+      })
+      .on('receipt', (receipt) => {
+        console.log('Receipt: ', receipt)
+      })
+      .on('confirmation', (confirmationNumber, receipt) => {
+        // TODO: Why output 24 confirmations ??
+        console.log('Conf: ', confirmationNumber)
+        console.log('receipt: ', receipt)
+      })
+      .on('error', console.error)
+  },
+
+  getBalance: function () {
+    App.contracts.StakePool.methods.getBalance().call({
+      from: App.account
+    }).then((value) => {
+      console.log('Update Balance: ', value)
+      $('#s_value').text(value)
+    }).catch((reason) => {
+      console.error('Rejected balance request: ', reason)
+    })
   }
 
 }
@@ -102,27 +135,20 @@ $('#b_refresh').on('click', () => {
 $('#b_trx').on('click', () => {
   // App.sendEther('1', '0x5755B9Bf6bf9d4bE8Bb36eCC8D212a3C329899ab')
   console.log('click#b_trx')
+  console.log($('#i_value').val())
   // default account is null
   // console.log(web3.eth.defaultAccount)
-  App.contracts.StakePool.methods.deposit()
-    .send({from: App.account, value: web3.utils.toWei('1', 'ether')})
-    .on('transactionHash', (hash) => {
-      console.log('trx_Hash: ', hash)
-    })
-    .on('confirmation', (confirmationNumber, receipt) => {
-      // output 24 confirmations ??
-      console.log('Conf: ', confirmationNumber)
-      console.log('receipt: ', receipt)
-    })
-    .on('receipt', (receipt) => {
-      console.log('Receipt: ', receipt)
-    })
-    .on('error', console.error)
+  App.sendTransaction($('#i_value').val())
+})
+
+$('#b_balance').on('click', () => {
+  console.log('click#b_balance')
+  App.getBalance()
 })
 
 function disableSend () {
   $('#b_trx').prop('disabled', true)
 }
 function enableSend () {
-  $('#b_trx').prop('disabled', true)
+  $('#b_trx').prop('disabled', false)
 }

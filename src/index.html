@@ -1,59 +1,95 @@
 <!doctype html>
-<html lang="en">
+<html lang='en'>
   <head>
     <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta charset='utf-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1, shrink-to-fit=no'>
 
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/custom.style.css">
+    <link rel='stylesheet' href='css/bootstrap.min.css'>
+    <link rel='stylesheet' href='css/custom.style.css'>
 
     <title>Staking Pool</title>
   </head>
   <body>
-    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-      <a class="navbar-brand" href="#">Staking Pool</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
+    <nav class='navbar navbar-expand-md navbar-dark fixed-top bg-dark'>
+      <a class='navbar-brand' href='#'>Staking Pool</a>
+      <button class='navbar-toggler' type='button' data-toggle='collapse' data-target='#navbarsExampleDefault' aria-controls='navbarsExampleDefault' aria-expanded='false' aria-label='Toggle navigation'>
+        <span class='navbar-toggler-icon'></span>
       </button>
 
-      <div class="collapse navbar-collapse" id="navbarsExampleDefault">
-        <ul class="navbar-nav mr-auto">
-          <li class="nav-item active">
-            <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+      <div class='collapse navbar-collapse' id='navbarsExampleDefault'>
+        <ul class='navbar-nav mr-auto'>
+          <li class='nav-item active'>
+            <a class='nav-link' href='#'>Home <span class='sr-only'>(current)</span></a>
           </li>
         </ul>
-        <button id="b_refresh" class="btn btn-primary" type="submit">Refresh Account</button>
-        <span id="t_account" class="navbar-text ml-2">
+        <button id='b_refresh' class='btn btn-primary' type='submit'>Refresh Account</button>
+        <span id='t_account' class='navbar-text ml-2'>
           Unlock MetaMask
         </span>
       </div>
     </nav>
 
-    <img id="i_metamask" src="img/metamask.png" class="img-fluid mx-auto d-block" alt="MetaMask"/>
+    <img id='i_metamask' src='img/metamask.png' class='img-fluid mx-auto d-block' alt='MetaMask'/>
 
-    <div class="container">
-      <div class="row">
-        <h2>Deposit History</h2>
-      </div>
-      <div class="row">
-        <button id="b_trx" class="btn btn-primary" type="submit">Send Transaction</button>
-      </div>
+    <div class='container'>
+      <hr />
+      <div class='row'>
+        <div class='col-sm-6'>
+        <h2>Transactions</h2>
+        <hr />
+        <div class='input-group mb-3 row'>
+          <div class='input-group-prepend'>
+            <span class='input-group-text' id='value-send'>Send value: </span>
+          </div>
+          <input id='i_value' type='text' class='form-control' placeholder='Value in ether' aria-label='Username' aria-describedby='value-send'>
+        </div>
+        <div class='row mb-3'>
+          <button id='b_trx' class='btn btn-primary ml-3' type='submit'>Send Transaction</button>
+        </div>
+        <div class='row'>
+          <button id='b_balance' class='btn btn-primary ml-3' type='submit'>Get balance</button>
+        </div>
+        </div> <!-- end column -->
+        <div class='col-sm-f'>
+          <h2>Balances</h2>
+        <hr />
+
+          <table class='table'>
+            <tbody>
+              <tr>
+                <td>Staked Balance:</td>
+                <td><span id='s_value'></span></td>
+              </tr>
+              <tr>
+                <td>Pending Withdrawal:</td>
+                <td><span id='s_pw'></span></td>
+              </tr>
+              <tr>
+                <td>Earnings: </td>
+                <td><span id='s_earn'></span></td>
+              </tr>
+            </tbody>
+          </table>
+
+        </div>
+      </div> <!-- end row -->
+      <hr />
     </div> <!-- end container -->
 
-    <footer class="footer">
-      <div class="container">
-        &copy; Copyright <span id="year"></span> Leros Capital LLC
+    <footer class='footer'>
+      <div class='container'>
+        &copy; Copyright <span id='year'></span> Leros Capital LLC
       </div>
     </footer>
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js (included in bootstrap bundle), then Bootstrap JS -->
-    <script src="js/jquery-3.3.1.min.js"></script>
-    <script src="js/bootstrap.bundle.min.js"></script>
-    <script src="js/web3.min.js"></script>
-    <script src="js/app.js"></script>
-    <script src="js/ui.js"></script>
+    <script src='js/jquery-3.3.1.min.js'></script>
+    <script src='js/bootstrap.bundle.min.js'></script>
+    <script src='js/web3.min.js'></script>
+    <script src='js/app.js'></script>
+    <script src='js/ui.js'></script>
     <script>
       // window waits for everything to load, not just DOM
       // $( window ).on( 'load', readyFn )
