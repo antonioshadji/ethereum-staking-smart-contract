@@ -7,3 +7,4 @@ $('#year').text(new Date().getFullYear())
 $('#i_metamask').on('click', () => {
   window.open('https://metamask.io', 'mm')
 })
+

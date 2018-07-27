@@ -66,11 +66,13 @@ const App = {
         App.contracts.StakePool = new web3.eth.Contract(
           data.abi,
           '0xF6BfB9dB4Cd57b8D1a38Dd134827b2da6ea8c5ae')
+        enableSend()
       })
       .fail(function (jqxhr, textStatus, error) {
         var err = textStatus + ', ' + error
         // console.log(jqxhr)
-        console.log('Request Failed: ' + err)
+        console.log('Failed to find Smart Contract: ' + err)
+        disableSend()
       })
   },
 
@@ -115,3 +117,10 @@ $('#b_trx').on('click', () => {
     })
     .on('error', console.error)
 })
+
+function disableSend () {
+  $('#b_trx').prop('disabled', true)
+}
+function enableSend () {
+  $('#b_trx').prop('disabled', true)
+}
