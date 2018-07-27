@@ -17,6 +17,7 @@ contract StakePool {
    }
 
    /** @dev withdrawal funds out of pool
+     * TODO: this must be a request for withdrawal as un-staking takes time
      *
      */
     function withdrawal() public payable returns (bool) {

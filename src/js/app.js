@@ -3,6 +3,7 @@
 const App = {
 
   rpcurl: 'http://127.0.0.1:7545',
+  contractAddress: '0xf6bfb9db4cd57b8d1a38dd134827b2da6ea8c5ae',
   web3Provider: null,
   contracts: {},
   activeInstance: null,
@@ -35,7 +36,6 @@ const App = {
     web3 = new Web3(App.web3Provider) // eslint-disable-line no-global-assign
 
     App.getActiveAccount()
-    App.initContract()
   },
 
   getActiveAccount: function () {
@@ -51,6 +51,8 @@ const App = {
       // Log the rejection reason
       console.log('Handle rejected promise (' + reason + ') here.')
     })
+
+    App.initContract()
   },
 
   updateAccount: function (acct) {
@@ -65,7 +67,7 @@ const App = {
         // instantiate new contract
         App.contracts.StakePool = new web3.eth.Contract(
           data.abi,
-          '0xF6BfB9dB4Cd57b8D1a38Dd134827b2da6ea8c5ae')
+          App.contractAddress)
         enableSend()
       })
       .fail(function (jqxhr, textStatus, error) {

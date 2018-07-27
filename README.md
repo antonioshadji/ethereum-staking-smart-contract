@@ -5,4 +5,7 @@
 | jquery    | https://code.jquery.com/jquery-3.3.1.min.js |
 
 
+truffle reset clears contract artifacts and creates new contract.  must be used
+when starting development after having migrated on previous day.  ganache starts 
+clean.
 
