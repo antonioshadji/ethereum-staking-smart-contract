@@ -1,4 +1,5 @@
 /* global $ */
+/* eslint no-unused-vars: off */
 
 /* uttily code for all sites */
 $('#year').text(new Date().getFullYear())
@@ -8,3 +9,18 @@ $('#i_metamask').on('click', () => {
   window.open('https://metamask.io', 'mm')
 })
 
+/* UI functions toolbox */
+const UI = {
+  toggleHiddenById: function (id) {
+    $(id).toggleClass('d-none')
+  },
+
+  disableElemById: function (id) {
+    $(id).prop('disabled', true)
+  },
+
+  enableElemById: function (id) {
+    $(id).prop('disabled', false)
+  }
+
+}

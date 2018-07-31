@@ -37,24 +37,21 @@
       <hr />
       <div class='row'>
         <div class='col-sm-6'>
-        <h2>Transactions</h2>
-        <hr />
-        <div class='input-group mb-3 row'>
-          <div class='input-group-prepend'>
-            <span class='input-group-text' id='value-send'>Send value: </span>
+          <h2>Transactions</h2>
+          <hr />
+          <div class='input-group mb-3'>
+            <div class='input-group-prepend'>
+              <button class="btn btn-primary" type="button" id="b_trx">Send Transaction</button>
+            </div>
+            <input id='i_value' type='text' class='form-control' placeholder='Value in ether' aria-label='Username' aria-describedby='value-send' step='3'>
           </div>
-          <input id='i_value' type='text' class='form-control' placeholder='Value in ether' aria-label='Username' aria-describedby='value-send'>
-        </div>
-        <div class='row mb-3'>
-          <button id='b_trx' class='btn btn-primary ml-3' type='submit'>Send Transaction</button>
-        </div>
-        <div class='row'>
-          <button id='b_balance' class='btn btn-primary ml-3' type='submit'>Get balance</button>
-        </div>
+          <div class='row'>
+            <button id='b_balance' class='btn btn-primary ml-3' type='submit'>Get balance</button>
+          </div>
         </div> <!-- end column -->
         <div class='col-sm-f'>
           <h2>Balances</h2>
-        <hr />
+          <hr />
 
           <table class='table'>
             <tbody>
@@ -77,10 +74,17 @@
       </div> <!-- end row -->
       <hr />
     </div> <!-- end container -->
-
+    <div class='text-center'>
+      <img id='spinner' class='d-none' src='img/DoubleRing-1s-200px.svg' alt='spinner' />
+    </div>
     <footer class='footer'>
-      <div class='container'>
-        &copy; Copyright <span id='year'></span> Leros Capital LLC
+      <div class='container text-center'>
+        &copy; Copyright <span id='year'></span> by
+        <a href='https://www.leroscapital.com'>Leros Capital LLC</a>
+        &bull;
+        <a href='https://loading.io/spinner/custom/165634/'>spinner by loading.io</a>
+        &bull;
+        <a href='https://getbootstrap.com/'>css by bootstrap</a>
       </div>
     </footer>
     <!-- Optional JavaScript -->

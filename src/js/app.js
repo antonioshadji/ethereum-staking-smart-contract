@@ -1,9 +1,8 @@
-/* global $, web3, Web3 */
+/* global $, web3, Web3, UI */
 
 const App = {
 
   rpcurl: 'http://127.0.0.1:7545',
-  contractAddress: '0xF6BfB9dB4Cd57b8D1a38Dd134827b2da6ea8c5ae',
   web3Provider: null,
   contracts: {},
   activeInstance: null,
@@ -34,8 +33,27 @@ const App = {
     }
     // define global web3 with provider
     web3 = new Web3(App.web3Provider) // eslint-disable-line no-global-assign
-
     App.getActiveAccount()
+  },
+
+  initContract: function () {
+    $.getJSON('./js/StakePool.json')
+      .done(function (data) {
+        console.log('Contract Data: ', data)
+        // instantiate new contract
+        App.contracts.StakePool = new web3.eth.Contract(
+          data.abi,
+          data.networks['5777'].address
+        )
+        UI.enableElemById('#b_trx')
+        App.getBalance()
+      })
+      .fail(function (jqxhr, textStatus, error) {
+        let err = textStatus + ', ' + error
+        console.log(jqxhr)
+        console.log('Failed to find Smart Contract: ' + err)
+        UI.disableElemById('#b_trx')
+      })
   },
 
   getActiveAccount: function () {
@@ -43,44 +61,32 @@ const App = {
     // use multiple .then to execute actions in sequence
     // .catch to catch errors
     web3.eth.getAccounts().then((result) => {
+      // TODO: if metamask is not logged in, promise returns empty array
       // 'this' is App object same as function getActiveAccount
       console.log('Promise value: ', result)
       return App.updateAccount(result[0])
     }).then((account) => {
+      // account returned as string
       console.log(account)
+      // make sure that contract is init only once
       if (Object.keys(App.contracts).length === 0) {
         App.initContract()
+      } else {
+        App.updateAccount(account)
       }
-      App.getBalance()
     }).catch((reason) => {
       // Log the rejection reason
       console.log('Handle rejected promise (' + reason + ') here.')
     })
   },
 
+  /* @param acct string
+   *
+   */
   updateAccount: function (acct) {
     App.account = acct
     $('#t_account').text(acct)
     return App.account
-  },
-
-  initContract: function () {
-    $.getJSON('./js/StakePool.json')
-      .done(function (data) {
-        console.log('DATA: ', data)
-        // instantiate new contract
-        App.contracts.StakePool = new web3.eth.Contract(
-          data.abi,
-          App.contractAddress)
-        enableSend()
-        App.getBalance()
-      })
-      .fail(function (jqxhr, textStatus, error) {
-        let err = textStatus + ', ' + error
-        console.log(jqxhr)
-        console.log('Failed to find Smart Contract: ' + err)
-        disableSend()
-      })
   },
 
   sendEther: function (value, target) {
@@ -97,6 +103,7 @@ const App = {
   },
 
   sendTransaction: function (value) {
+    // TODO: value must be <= 18 decimal places -- otherwise fails
     App.contracts.StakePool.methods.deposit()
       .send({from: App.account, value: web3.utils.toWei(value, 'ether')})
       .on('transactionHash', (hash) => {
@@ -109,6 +116,7 @@ const App = {
         // TODO: Why output 24 confirmations ??
         console.log('Conf: ', confirmationNumber)
         console.log('receipt: ', receipt)
+        App.getBalance()
       })
       .on('error', console.error)
   },
@@ -117,8 +125,10 @@ const App = {
     App.contracts.StakePool.methods.getBalance().call({
       from: App.account
     }).then((value) => {
+      // @value param string
       console.log('Update Balance: ', value)
-      $('#s_value').text(value)
+      // value is in wei, display in ether
+      $('#s_value').text(web3.utils.fromWei(value, 'ether'))
     }).catch((reason) => {
       console.error('Rejected balance request: ', reason)
     })
@@ -145,10 +155,3 @@ $('#b_balance').on('click', () => {
   console.log('click#b_balance')
   App.getBalance()
 })
-
-function disableSend () {
-  $('#b_trx').prop('disabled', true)
-}
-function enableSend () {
-  $('#b_trx').prop('disabled', false)
-}
