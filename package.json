@@ -19,5 +19,7 @@
     "chai": "4.1.2",
     "mocha": "5.2.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "zeppelin-solidity": "1.11.0"
+  }
 }

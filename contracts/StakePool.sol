@@ -1,5 +1,7 @@
 pragma solidity ^0.4.24;
 
+import 'zeppelin-solidity/contracts/math/SafeMath.sol';
+
 /* @title Staking Pool Contract */
 contract StakePool {
 
