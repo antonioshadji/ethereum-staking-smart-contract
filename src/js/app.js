@@ -76,7 +76,7 @@ const App = {
         App.getBalance()
       })
       .fail(function (jqxhr, textStatus, error) {
-        var err = textStatus + ', ' + error
+        let err = textStatus + ', ' + error
         console.log(jqxhr)
         console.log('Failed to find Smart Contract: ' + err)
         disableSend()
