@@ -12,9 +12,6 @@
  *   },
  */
 
-// const $ = require('./src/js/jquery-3.3.1.min.js')
-// global.$ = $
-
 module.exports = {
   // See <http://truffleframework.com/docs/advanced/configuration>
   // to customize your Truffle configuration!
