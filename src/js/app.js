@@ -5,6 +5,7 @@ const App = {
   rpcurl: 'http://127.0.0.1:7545',
   web3Provider: null,
   contracts: {},
+  events: {},
   activeInstance: null,
   account: null,
 
@@ -18,10 +19,10 @@ const App = {
     if (typeof web3 !== 'undefined') {
       if (web3.currentProvider.isMetaMask) {
         console.log('Metamask detected')
+        App.web3Provider = web3.currentProvider
       } else {
         console.log('Metamask not detected, found other web3')
       }
-      App.web3Provider = web3.currentProvider
     } else {
       // If no injected web3 instance is detected, fall back to Ganache
       // TODO: verify correct server for testing
@@ -33,27 +34,9 @@ const App = {
     }
     // define global web3 with provider
     web3 = new Web3(App.web3Provider) // eslint-disable-line no-global-assign
-    App.getActiveAccount()
-  },
+    console.log('web3 api: ', web3.version)
 
-  initContract: function () {
-    $.getJSON('./js/StakePool.json')
-      .done(function (data) {
-        console.log('Contract Data: ', data)
-        // instantiate new contract
-        App.contracts.StakePool = new web3.eth.Contract(
-          data.abi,
-          data.networks['5777'].address
-        )
-        UI.enableElemById('#b_trx')
-        App.getBalance()
-      })
-      .fail(function (jqxhr, textStatus, error) {
-        let err = textStatus + ', ' + error
-        console.log(jqxhr)
-        console.log('Failed to find Smart Contract: ' + err)
-        UI.disableElemById('#b_trx')
-      })
+    App.getActiveAccount()
   },
 
   getActiveAccount: function () {
@@ -80,6 +63,32 @@ const App = {
     })
   },
 
+  initContract: function () {
+    $.getJSON('./js/StakePool.json')
+      .done(function (data) {
+        console.log('Contract Data: ', data)
+        // instantiate new contract
+        // TODO: how do I get the correct network programattically?
+        App.contracts.StakePool = new web3.eth.Contract(
+          data.abi,
+          data.networks['5777'].address
+        )
+        UI.enableElemById('#b_trx')
+        App.getBalance()
+      })
+      .then(function (data) {
+        console.log('getJSON.then')
+        // TypeError: "App.contracts.StakePool.NotifyDeposit is not a function"
+        // App.initEvents()
+      })
+      .fail(function (jqxhr, textStatus, error) {
+        let err = textStatus + ', ' + error
+        console.log(jqxhr)
+        console.log('Failed to find Smart Contract: ' + err)
+        UI.disableElemById('#b_trx')
+      })
+  },
+
   /* @param acct string
    *
    */
@@ -87,19 +96,6 @@ const App = {
     App.account = acct
     $('#t_account').text(acct)
     return App.account
-  },
-
-  sendEther: function (value, target) {
-    web3.eth.sendTransaction({
-      from: App.account,
-      to: target,
-      value: web3.utils.toWei(value, 'ether')
-    }).then((result) => {
-      console.log('Promise value: ', result)
-    }).catch((reason) => {
-      // Log the rejection reason
-      console.log('Handle rejected promise (' + reason + ') here.')
-    })
   },
 
   sendTransaction: function (value) {
@@ -111,14 +107,23 @@ const App = {
       })
       .on('receipt', (receipt) => {
         console.log('Receipt: ', receipt)
+        console.log('event->amount: ',
+          receipt.events.NotifyDeposit.returnValues.amount)
       })
       .on('confirmation', (confirmationNumber, receipt) => {
         // TODO: Why output 24 confirmations ??
         console.log('Conf: ', confirmationNumber)
         console.log('receipt: ', receipt)
+        // TODO: first attempt to update balance after transaction
+        // this can be removed once event is used in receipt
         App.getBalance()
       })
       .on('error', console.error)
+      .then(function (receipt) {
+        console.log('Then.Receipt:\n', receipt)
+        // does not work here
+        // App.getBalance()
+      })
   },
 
   getBalance: function () {
@@ -132,6 +137,49 @@ const App = {
     }).catch((reason) => {
       console.error('Rejected balance request: ', reason)
     })
+  },
+
+  initEvents: function () {
+    App.events.Deposit =
+      App.contracts.StakePool.events.NotifyDeposit({},
+        function (error, result) {
+          if (error) {
+            console.error('ERROR:\n', error)
+          } else {
+            console.log('EVENT:\n', result)
+            // TODO: this is a better place for update balance than on confirmation
+          }
+        }
+      )
+        .then(data => {
+          console.log('DepositEvent: ', App.events.Deposit)
+          console.log(data)
+        })
+  },
+
+  testSendEther: function (value, target) {
+    web3.eth.sendTransaction({
+      from: App.account,
+      to: target,
+      value: web3.utils.toWei(value, 'ether')
+    }).then((result) => {
+      console.log('Promise value: ', result)
+    }).catch((reason) => {
+      // Log the rejection reason
+      console.log('Handle rejected promise (' + reason + ') here.')
+    })
+  },
+
+  testEvents: function () {
+    // this is App with function
+    // this is Window with =>
+    //
+    // this code only retrieves last event
+    App.contracts.StakePool.getPastEvents('allEvents', { from: App.account },
+      function (error, events) {
+        if (error) console.error('testEvents ERROR: ', error)
+        console.log('testEvents: ', events)
+      })
   }
 
 }

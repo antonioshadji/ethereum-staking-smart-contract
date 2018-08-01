@@ -8,6 +8,10 @@ contract StakePool {
   // track balances of ether deposited to contract
   mapping(address => uint) poolBalances;
 
+  /** @dev trigger notification of deposits
+    */
+  event NotifyDeposit(address sender, uint amount, uint balance);
+
   /** @dev creates contract
     */
   constructor() public { }
@@ -16,6 +20,7 @@ contract StakePool {
     */
    function deposit() public payable {
      poolBalances[msg.sender] += msg.value;
+     emit NotifyDeposit(msg.sender, msg.value, poolBalances[msg.sender]);
    }
 
    /** @dev withdrawal funds out of pool
