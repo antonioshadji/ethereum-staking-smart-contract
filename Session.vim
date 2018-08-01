@@ -145,11 +145,11 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
-badd +139 src/js/app.js
-badd +1 src/index.html
-badd +22 contracts/StakePool.sol
+badd +27 src/index.html
+badd +17 src/js/app.js
 argglobal
 silent! argdel *
+$argadd src/index.html
 edit src/js/app.js
 set splitbelow splitright
 wincmd _ | wincmd |
@@ -286,132 +286,12 @@ setlocal nowinfixwidth
 set nowrap
 setlocal nowrap
 setlocal wrapmargin=0
-3
-normal! zo
-12
-normal! zo
-17
-normal! zo
-19
-normal! zo
-40
-normal! zo
-42
-normal! zo
-42
-normal! zo
-52
-normal! zo
-60
-normal! zo
-64
-normal! zo
-64
-normal! zo
-93
-normal! zo
-94
-normal! zo
-106
-normal! zo
-110
-normal! zo
-113
-normal! zo
-116
-normal! zo
-125
-normal! zo
-126
-normal! zo
-17
-normal! zo
-19
-normal! zo
-40
-normal! zo
-42
-normal! zo
-42
-normal! zo
-53
-normal! zo
-61
-normal! zo
-65
-normal! zo
-65
-normal! zo
-94
-normal! zo
-95
-normal! zo
-107
-normal! zo
-111
-normal! zo
-114
-normal! zo
-117
-normal! zo
-126
-normal! zo
-127
-normal! zo
-139
-normal! zo
-140
-normal! zo
-141
-normal! zo
-155
-normal! zo
-159
-normal! zo
-168
-normal! zo
-53
-normal! zo
-61
-normal! zo
-65
-normal! zo
-65
-normal! zo
-94
-normal! zo
-95
-normal! zo
-107
-normal! zo
-111
-normal! zo
-114
-normal! zo
-117
-normal! zo
-126
-normal! zo
-127
-normal! zo
-139
-normal! zo
-140
-normal! zo
-141
-normal! zo
-155
-normal! zo
-159
-normal! zo
-168
-normal! zo
-let s:l = 51 - ((24 * winheight(0) + 25) / 51)
+let s:l = 17 - ((16 * winheight(0) + 25) / 51)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-51
-normal! 024|
+17
+normal! 018|
 wincmd w
 argglobal
 if bufexists('src/index.html') | buffer src/index.html | else | edit src/index.html | endif
@@ -459,10 +339,10 @@ setlocal foldenable
 setlocal foldexpr=0
 setlocal foldignore=#
 set foldlevel=99
-setlocal foldlevel=99
+setlocal foldlevel=0
 setlocal foldmarker={{{,}}}
 set foldmethod=syntax
-setlocal foldmethod=syntax
+setlocal foldmethod=manual
 setlocal foldminlines=1
 setlocal foldnestmax=20
 setlocal foldtext=foldtext()
@@ -538,12 +418,13 @@ setlocal nowinfixwidth
 set nowrap
 setlocal nowrap
 setlocal wrapmargin=0
-let s:l = 73 - ((39 * winheight(0) + 25) / 51)
+silent! normal! zE
+let s:l = 27 - ((25 * winheight(0) + 25) / 51)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-73
-normal! 015|
+27
+normal! 0
 wincmd w
 2wincmd w
 exe 'vert 1resize ' . ((&columns * 94 + 95) / 190)
