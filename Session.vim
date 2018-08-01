@@ -145,8 +145,9 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
-badd +0 src/js/app.js
-badd +0 src/index.html
+badd +139 src/js/app.js
+badd +1 src/index.html
+badd +22 contracts/StakePool.sol
 argglobal
 silent! argdel *
 edit src/js/app.js
@@ -155,20 +156,13 @@ wincmd _ | wincmd |
 vsplit
 1wincmd h
 wincmd w
-wincmd _ | wincmd |
-split
-1wincmd k
-wincmd w
 wincmd t
 set winminheight=0
 set winheight=1
 set winminwidth=0
 set winwidth=1
 exe 'vert 1resize ' . ((&columns * 94 + 95) / 190)
-exe '2resize ' . ((&lines * 34 + 27) / 54)
 exe 'vert 2resize ' . ((&columns * 95 + 95) / 190)
-exe '3resize ' . ((&lines * 16 + 27) / 54)
-exe 'vert 3resize ' . ((&columns * 95 + 95) / 190)
 argglobal
 setlocal keymap=
 setlocal noarabic
@@ -294,16 +288,130 @@ setlocal nowrap
 setlocal wrapmargin=0
 3
 normal! zo
-67
+12
 normal! zo
-78
+17
 normal! zo
-let s:l = 79 - ((33 * winheight(0) + 25) / 51)
+19
+normal! zo
+40
+normal! zo
+42
+normal! zo
+42
+normal! zo
+52
+normal! zo
+60
+normal! zo
+64
+normal! zo
+64
+normal! zo
+93
+normal! zo
+94
+normal! zo
+106
+normal! zo
+110
+normal! zo
+113
+normal! zo
+116
+normal! zo
+125
+normal! zo
+126
+normal! zo
+17
+normal! zo
+19
+normal! zo
+40
+normal! zo
+42
+normal! zo
+42
+normal! zo
+53
+normal! zo
+61
+normal! zo
+65
+normal! zo
+65
+normal! zo
+94
+normal! zo
+95
+normal! zo
+107
+normal! zo
+111
+normal! zo
+114
+normal! zo
+117
+normal! zo
+126
+normal! zo
+127
+normal! zo
+139
+normal! zo
+140
+normal! zo
+141
+normal! zo
+155
+normal! zo
+159
+normal! zo
+168
+normal! zo
+53
+normal! zo
+61
+normal! zo
+65
+normal! zo
+65
+normal! zo
+94
+normal! zo
+95
+normal! zo
+107
+normal! zo
+111
+normal! zo
+114
+normal! zo
+117
+normal! zo
+126
+normal! zo
+127
+normal! zo
+139
+normal! zo
+140
+normal! zo
+141
+normal! zo
+155
+normal! zo
+159
+normal! zo
+168
+normal! zo
+let s:l = 51 - ((24 * winheight(0) + 25) / 51)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-79
-normal! 011|
+51
+normal! 024|
 wincmd w
 argglobal
 if bufexists('src/index.html') | buffer src/index.html | else | edit src/index.html | endif
@@ -392,7 +500,8 @@ setlocal nopreserveindent
 setlocal nopreviewwindow
 setlocal quoteescape=\\
 setlocal noreadonly
-setlocal norelativenumber
+set relativenumber
+setlocal relativenumber
 setlocal norightleft
 setlocal rightleftcmd=search
 setlocal noscrollbind
@@ -429,151 +538,16 @@ setlocal nowinfixwidth
 set nowrap
 setlocal nowrap
 setlocal wrapmargin=0
-let s:l = 73 - ((17 * winheight(0) + 17) / 34)
+let s:l = 73 - ((39 * winheight(0) + 25) / 51)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
 73
-normal! 021|
+normal! 015|
 wincmd w
-argglobal
-terminal ++curwin ++cols=95 ++rows=16 
-setlocal keymap=
-setlocal noarabic
-setlocal autoindent
-setlocal backupcopy=
-setlocal balloonexpr=
-setlocal nobinary
-setlocal nobreakindent
-setlocal breakindentopt=
-setlocal bufhidden=
-setlocal buflisted
-setlocal buftype=terminal
-setlocal nocindent
-setlocal cinkeys=0{,0},0),:,0#,!^F,o,O,e
-setlocal cinoptions=
-setlocal cinwords=if,else,while,do,for,switch
-set colorcolumn=80
-setlocal colorcolumn=80
-setlocal comments=s1:/*,mb:*,ex:*/,://,b:#,:%,:XCOMM,n:>,fb:-
-setlocal commentstring=/*%s*/
-setlocal complete=.,w,b,u,t,i
-setlocal concealcursor=
-setlocal conceallevel=0
-setlocal completefunc=
-setlocal nocopyindent
-setlocal cryptmethod=
-setlocal nocursorbind
-setlocal nocursorcolumn
-set cursorline
-setlocal cursorline
-setlocal define=
-setlocal dictionary=
-setlocal nodiff
-setlocal equalprg=
-setlocal errorformat=
-setlocal expandtab
-if &filetype != ''
-setlocal filetype=
-endif
-setlocal fixendofline
-setlocal foldcolumn=0
-setlocal foldenable
-setlocal foldexpr=0
-setlocal foldignore=#
-set foldlevel=99
-setlocal foldlevel=99
-setlocal foldmarker={{{,}}}
-set foldmethod=syntax
-setlocal foldmethod=syntax
-setlocal foldminlines=1
-setlocal foldnestmax=20
-setlocal foldtext=foldtext()
-setlocal formatexpr=
-setlocal formatoptions=tcqj
-setlocal formatlistpat=^\\s*\\d\\+[\\]:.)}\\t\ ]\\s*
-setlocal formatprg=
-setlocal grepprg=
-setlocal iminsert=0
-setlocal imsearch=-1
-setlocal include=
-setlocal includeexpr=
-setlocal indentexpr=
-setlocal indentkeys=0{,0},:,0#,!^F,o,O,e
-setlocal noinfercase
-setlocal iskeyword=@,48-57,_,192-255
-setlocal keywordprg=
-setlocal nolinebreak
-setlocal nolisp
-setlocal lispwords=
-set list
-setlocal list
-setlocal makeencoding=
-setlocal makeprg=
-setlocal matchpairs=(:),{:},[:]
-setlocal modeline
-setlocal nomodifiable
-setlocal nrformats=bin,hex
-set number
-setlocal number
-setlocal numberwidth=4
-setlocal omnifunc=
-setlocal path=
-setlocal nopreserveindent
-setlocal nopreviewwindow
-setlocal quoteescape=\\
-setlocal noreadonly
-set relativenumber
-setlocal relativenumber
-setlocal norightleft
-setlocal rightleftcmd=search
-setlocal noscrollbind
-setlocal shiftwidth=2
-setlocal noshortname
-setlocal signcolumn=auto
-setlocal nosmartindent
-setlocal softtabstop=2
-setlocal nospell
-setlocal spellcapcheck=[.?!]\\_[\\])'\"\	\ ]\\+
-setlocal spellfile=
-setlocal spelllang=en
-setlocal statusline=%!airline#statusline(3)
-setlocal suffixesadd=
-setlocal swapfile
-setlocal synmaxcol=3000
-if &syntax != ''
-setlocal syntax=
-endif
-setlocal tabstop=2
-setlocal tagcase=
-setlocal tags=
-setlocal termwinkey=
-setlocal termwinscroll=10000
-setlocal termwinsize=
-setlocal textwidth=0
-setlocal thesaurus=
-setlocal undofile
-setlocal undolevels=-123456
-setlocal varsofttabstop=
-setlocal vartabstop=
-setlocal nowinfixheight
-setlocal nowinfixwidth
-set nowrap
-setlocal nowrap
-setlocal wrapmargin=0
-let s:l = 1 - ((0 * winheight(0) + 8) / 16)
-if s:l < 1 | let s:l = 1 | endif
-exe s:l
-normal! zt
-1
-normal! 0
-wincmd w
-3wincmd w
+2wincmd w
 exe 'vert 1resize ' . ((&columns * 94 + 95) / 190)
-exe '2resize ' . ((&lines * 34 + 27) / 54)
 exe 'vert 2resize ' . ((&columns * 95 + 95) / 190)
-exe '3resize ' . ((&lines * 16 + 27) / 54)
-exe 'vert 3resize ' . ((&columns * 95 + 95) / 190)
 tabnext 1
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0
   silent exe 'bwipe ' . s:wipebuf
