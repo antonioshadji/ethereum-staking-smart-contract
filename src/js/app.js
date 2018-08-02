@@ -114,6 +114,11 @@ const App = {
         // TODO: Why output 24 confirmations ??
         console.log('Conf: ', confirmationNumber)
         console.log('receipt: ', receipt)
+        // TODO: have App.getBalance callback/promise turn spinner off
+        if (confirmationNumber === 1 || confirmationNumber === 10) {
+          UI.toggleHiddenElementById('#spinner')
+        }
+
         // TODO: first attempt to update balance after transaction
         // this can be removed once event is used in receipt
         App.getBalance()

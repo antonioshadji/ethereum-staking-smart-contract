@@ -145,10 +145,13 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
-badd +27 src/index.html
-badd +17 src/js/app.js
+badd +119 src/js/app.js
+badd +0 src/index.html
+badd +26 src/js/ui.js
+badd +18 src/css/custom.style.css
 argglobal
 silent! argdel *
+$argadd src/js/app.js
 $argadd src/index.html
 edit src/js/app.js
 set splitbelow splitright
@@ -161,8 +164,8 @@ set winminheight=0
 set winheight=1
 set winminwidth=0
 set winwidth=1
-exe 'vert 1resize ' . ((&columns * 94 + 95) / 190)
-exe 'vert 2resize ' . ((&columns * 95 + 95) / 190)
+exe 'vert 1resize ' . ((&columns * 88 + 95) / 190)
+exe 'vert 2resize ' . ((&columns * 101 + 95) / 190)
 argglobal
 setlocal keymap=
 setlocal noarabic
@@ -249,7 +252,8 @@ setlocal nopreserveindent
 setlocal nopreviewwindow
 setlocal quoteescape=\\
 setlocal noreadonly
-setlocal norelativenumber
+set relativenumber
+setlocal relativenumber
 setlocal norightleft
 setlocal rightleftcmd=search
 setlocal noscrollbind
@@ -286,15 +290,103 @@ setlocal nowinfixwidth
 set nowrap
 setlocal nowrap
 setlocal wrapmargin=0
-let s:l = 17 - ((16 * winheight(0) + 25) / 51)
+3
+normal! zo
+101
+normal! zo
+113
+normal! zo
+113
+normal! zo
+117
+normal! zo
+126
+normal! zo
+126
+normal! zo
+133
+normal! zo
+134
+normal! zo
+146
+normal! zo
+148
+normal! zo
+149
+normal! zo
+158
+normal! zo
+164
+normal! zo
+165
+normal! zo
+177
+normal! zo
+182
+normal! zo
+133
+normal! zo
+134
+normal! zo
+146
+normal! zo
+148
+normal! zo
+149
+normal! zo
+158
+normal! zo
+164
+normal! zo
+165
+normal! zo
+177
+normal! zo
+182
+normal! zo
+193
+normal! zo
+197
+normal! zo
+206
+normal! zo
+126
+normal! zo
+133
+normal! zo
+134
+normal! zo
+146
+normal! zo
+148
+normal! zo
+149
+normal! zo
+158
+normal! zo
+164
+normal! zo
+165
+normal! zo
+177
+normal! zo
+182
+normal! zo
+193
+normal! zo
+197
+normal! zo
+206
+normal! zo
+let s:l = 119 - ((25 * winheight(0) + 25) / 51)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-17
-normal! 018|
+119
+normal! 0
 wincmd w
 argglobal
-if bufexists('src/index.html') | buffer src/index.html | else | edit src/index.html | endif
+2argu
 setlocal keymap=
 setlocal noarabic
 setlocal autoindent
@@ -338,10 +430,8 @@ setlocal foldcolumn=0
 setlocal foldenable
 setlocal foldexpr=0
 setlocal foldignore=#
-set foldlevel=99
 setlocal foldlevel=0
 setlocal foldmarker={{{,}}}
-set foldmethod=syntax
 setlocal foldmethod=manual
 setlocal foldminlines=1
 setlocal foldnestmax=20
@@ -380,8 +470,7 @@ setlocal nopreserveindent
 setlocal nopreviewwindow
 setlocal quoteescape=\\
 setlocal noreadonly
-set relativenumber
-setlocal relativenumber
+setlocal norelativenumber
 setlocal norightleft
 setlocal rightleftcmd=search
 setlocal noscrollbind
@@ -419,16 +508,15 @@ set nowrap
 setlocal nowrap
 setlocal wrapmargin=0
 silent! normal! zE
-let s:l = 27 - ((25 * winheight(0) + 25) / 51)
+let s:l = 97 - ((23 * winheight(0) + 25) / 51)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-27
+97
 normal! 0
 wincmd w
-2wincmd w
-exe 'vert 1resize ' . ((&columns * 94 + 95) / 190)
-exe 'vert 2resize ' . ((&columns * 95 + 95) / 190)
+exe 'vert 1resize ' . ((&columns * 88 + 95) / 190)
+exe 'vert 2resize ' . ((&columns * 101 + 95) / 190)
 tabnext 1
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0
   silent exe 'bwipe ' . s:wipebuf
