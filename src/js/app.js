@@ -120,6 +120,28 @@ const App = {
     })
   },
 
+  makeWithdrawal: function (value) {
+    // TODO: how can I add a verification message to Metamask?
+    App.contracts.StakePool.deployed().then(function (instance) {
+      return instance.withdrawal(
+        web3.toWei(value, 'ether'),
+        { from: App.account }
+      )
+    }).then(function (result) {
+      if (result) {
+        console.log('success')
+        console.log(result)
+        let b = web3.fromWei(result.logs[0].args.finalBal.toNumber(), 'ether')
+        $('#s_value').text(b)
+      } else {
+        console.log('failed')
+        console.log(result)
+      }
+    }).catch(function (err) {
+      console.log('Error: ', err)
+    })
+  },
+
   logNetwork: function () {
     web3.version.getNetwork((err, netId) => {
       if (err) {
@@ -190,6 +212,14 @@ $('#b_trx').on('click', () => {
   // default account is null
   // console.log(web3.eth.defaultAccount)
   App.sendTransaction($('#i_value').val())
+})
+
+$('#b_withdrawal').on('click', () => {
+  console.log('click#b_withdrawal')
+  console.log($('#i_withdrawal').val())
+  // default account is null
+  // console.log(web3.eth.defaultAccount)
+  App.makeWithdrawal($('#i_withdrawal').val())
 })
 
 $('#b_balance').on('click', () => {

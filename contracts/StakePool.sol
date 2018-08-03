@@ -10,7 +10,18 @@ contract StakePool {
 
   /** @dev trigger notification of deposits
     */
-  event NotifyDeposit(address sender, uint amount, uint balance);
+  event NotifyDeposit(
+    address sender,
+    uint amount,
+    uint balance);
+
+  /** @dev trigger notification of withdrawal
+    */
+  event NotifyWithdrawal(
+    address sender,
+    uint startBal,
+    uint finalBal,
+    uint request);
 
   /** @dev creates contract
     */
@@ -25,15 +36,25 @@ contract StakePool {
 
    /** @dev withdrawal funds out of pool
      * TODO: this must be a request for withdrawal as un-staking takes time
+     * not payable, not receiving funds
      *
      */
-    function withdrawal() public payable returns (bool) {
-     if (poolBalances[msg.sender] >= msg.value) {
-       if (!msg.sender.send(msg.value)) {
-         return false;
-       }
+    function withdrawal(uint wdValue) public {
+      require(wdValue > 0);
+      if (poolBalances[msg.sender] >= wdValue) {
+       // open zeppelin sub function to ensure no overflow
+       uint startBalance = poolBalances[msg.sender];
+       uint newBalance = SafeMath.sub(poolBalances[msg.sender], wdValue);
+       poolBalances[msg.sender] = newBalance;
+       msg.sender.transfer(wdValue);
+
+      emit NotifyWithdrawal(
+        msg.sender,
+        startBalance,
+        poolBalances[msg.sender],
+        wdValue
+      );
      }
-     return true;
     }
 
     /** @dev retreive balance from contract
