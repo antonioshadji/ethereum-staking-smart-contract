@@ -1,4 +1,4 @@
-/* global $ */
+/* global $ , web3 */
 /* eslint no-unused-vars: off */
 
 /* UI functions toolbox */
@@ -22,6 +22,11 @@ const UI = {
     /* project specific */
     $('#i_metamask').on('click', () => {
       window.open('https://metamask.io', 'mm')
+    })
+
+    $('#b_max').on('click', () => {
+      console.log('click')
+      $('#i_withdrawal').val(new web3.BigNumber($('#s_value').text()).toNumber())
     })
   }
 
