@@ -33,6 +33,7 @@ const App = {
         console.log('Metamask not detected, found other web3')
       }
     } else {
+      // TODO: In production, warn that Metamask is not enabled and disable
       // If no injected web3 instance is detected, fall back to create web3
       // TODO: verify correct server for testing
       console.log('create new web3')
@@ -46,7 +47,6 @@ const App = {
     web3 = new Web3(App.web3Provider) // eslint-disable-line no-global-assign
     console.log('web3 version: ', web3.version)
     App.logNetwork()
-    console.log(web3.eth.accounts)
     App.updateAccount()
     return App.initContract()
   },
@@ -56,9 +56,6 @@ const App = {
       console.log('Contract Data: ', data)
       // instantiate new contract
       // TODO: update network programattically
-      // App.contracts.StakePool = web3.eth.contract(data.abi).at(
-      //   data.networks['5777'].address
-      // )
       App.contracts.StakePool = TruffleContract(data)
       App.contracts.StakePool.setProvider(App.web3Provider)
     })
@@ -67,7 +64,6 @@ const App = {
         console.log('StakePool:\n', App.contracts.StakePool)
         UI.enableElemById('#b_trx')
         App.getBalance()
-        // return App.initEvents()
       })
       .fail(function (jqxhr, textStatus, error) {
         let err = textStatus + ', ' + error
@@ -77,20 +73,6 @@ const App = {
         return error
       })
   },
-
-  //  initEvents: function () {
-  //    App.events.Deposit =
-  //      App.contracts.StakePool.NotifyDeposit({},
-  //        function (error, result) {
-  //          if (error) {
-  //            console.error('ERROR:\n', error)
-  //          } else {
-  //            console.log('EVENT:\n', result)
-  //            // TODO: this is a better place for update balance than on confirmation
-  //          }
-  //        }
-  //      )
-  //  },
 
   updateAccount: function () {
     App.account = web3.eth.coinbase
@@ -117,44 +99,6 @@ const App = {
       console.log('transaction rejected by user')
       console.log(err.message)
     })
-
-    // App.contracts.StakePool.deposit().sendTransaction(
-    //   {
-    //     from: App.account,
-    //     value: web3.toWei(value, 'ether')
-    //   },
-    //   function (err, transactionHash) {
-    //     if (!err) {
-    //       console.log('trx_Hash: ', transactionHash)
-    //     } else {
-    //       console.error(err)
-    //     }
-    //   })
-
-    // .on('receipt', (receipt) => {
-    //     console.log('Receipt: ', receipt)
-    //     console.log('event->amount: ',
-    //       receipt.events.NotifyDeposit.returnValues.amount)
-    //   })
-    //   .on('confirmation', (confirmationNumber, receipt) => {
-    //     // TODO: Why output 24 confirmations ??
-    //     console.log('Conf: ', confirmationNumber)
-    //     console.log('receipt: ', receipt)
-    //     // TODO: have App.getBalance callback/promise turn spinner off
-    //     if (confirmationNumber === 1 || confirmationNumber === 10) {
-    //       UI.toggleHiddenElementById('#spinner')
-    //     }
-
-    //     // TODO: first attempt to update balance after transaction
-    //     // this can be removed once event is used in receipt
-    //     App.getBalance()
-    //   })
-    //   .on('error', console.error)
-    //   .then(function (receipt) {
-    //     console.log('Then.Receipt:\n', receipt)
-    //     // does not work here
-    //     // App.getBalance()
-    //   })
   },
 
   getBalance: function () {
@@ -174,20 +118,6 @@ const App = {
     }).catch(function (err) {
       console.error('Rejected balance request: ', err)
     })
-
-    //    App.contracts.StakePool.getBalance().call(
-    //      {from: App.account},
-    //      function (err, result) {
-    //        if (err) {
-    //          console.error('Rejected balance request: ', err)
-    //        } else {
-    //          console.log('Update Balance: ', result)
-    //        // value is in wei, display in ether
-    //        // TODO: update UI with balance
-    //        // $('#s_value').text(web3.utils.fromWei(value, 'ether'))
-    //        }
-    //      }
-    //    )
   },
 
   logNetwork: function () {
