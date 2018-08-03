@@ -1,4 +1,4 @@
-/* global $, web3, Web3, UI */
+/* global $, web3, Web3, UI, TruffleContract */
 
 /* metamask only supports these methods syncronously
  * eth_accounts (web3.eth.accounts)
@@ -10,16 +10,17 @@
 
 const App = {
 
-  rpcurl: 'http://127.0.0.1:7545',
   web3Provider: null,
   contracts: {},
+  rpcurl: 'http://127.0.0.1:7545',
+  network: null,
   events: {},
-  activeInstance: null,
   account: null,
 
   init: function () {
     console.log('App.init')
-    App.initWeb3()
+    UI.setup()
+    return App.initWeb3()
   },
 
   initWeb3: function () {
@@ -46,132 +47,147 @@ const App = {
     console.log('web3 version: ', web3.version)
     App.logNetwork()
     console.log(web3.eth.accounts)
-    console.log(web3.eth.coinbase)
-
-    App.getActiveAccount()
-  },
-
-  getActiveAccount: function () {
-    // getAccounts returns a promise -- must use .then to receive result
-    // use multiple .then to execute actions in sequence
-    // .catch to catch errors
-    web3.eth.getAccounts().then((result) => {
-      // TODO: if metamask is not logged in, promise returns empty array
-      // 'this' is App object same as function getActiveAccount
-      console.log('Promise value: ', result)
-      return App.updateAccount(result[0])
-    }).then((account) => {
-      // account returned as string
-      console.log(account)
-      // make sure that contract is init only once
-      if (Object.keys(App.contracts).length === 0) {
-        App.initContract()
-      } else {
-        App.updateAccount(account)
-      }
-    }).catch((reason) => {
-      // Log the rejection reason
-      console.log('Handle rejected promise (' + reason + ') here.')
-    })
+    App.updateAccount()
+    return App.initContract()
   },
 
   initContract: function () {
-    $.getJSON('./js/StakePool.json')
-      .done(function (data) {
-        console.log('Contract Data: ', data)
-        // instantiate new contract
-        // TODO: how do I get the correct network programattically?
-        App.contracts.StakePool = new web3.eth.Contract(
-          data.abi,
-          data.networks['5777'].address
-        )
-        UI.enableElemById('#b_trx')
-        App.getBalance()
-      })
+    $.getJSON('./js/StakePool.json', function (data) {
+      console.log('Contract Data: ', data)
+      // instantiate new contract
+      // TODO: update network programattically
+      // App.contracts.StakePool = web3.eth.contract(data.abi).at(
+      //   data.networks['5777'].address
+      // )
+      App.contracts.StakePool = TruffleContract(data)
+      App.contracts.StakePool.setProvider(App.web3Provider)
+    })
       .then(function (data) {
         console.log('getJSON.then')
-        // TypeError: "App.contracts.StakePool.NotifyDeposit is not a function"
-        // App.initEvents()
+        console.log('StakePool:\n', App.contracts.StakePool)
+        UI.enableElemById('#b_trx')
+        App.getBalance()
+        // return App.initEvents()
       })
       .fail(function (jqxhr, textStatus, error) {
         let err = textStatus + ', ' + error
-        console.log(jqxhr)
+        console.log('jQuery jqxhr: ', jqxhr)
         console.log('Failed to find Smart Contract: ' + err)
         UI.disableElemById('#b_trx')
+        return error
       })
   },
 
-  /* @param acct string
-   *
-   */
-  updateAccount: function (acct) {
-    App.account = acct
-    $('#t_account').text(acct)
+  //  initEvents: function () {
+  //    App.events.Deposit =
+  //      App.contracts.StakePool.NotifyDeposit({},
+  //        function (error, result) {
+  //          if (error) {
+  //            console.error('ERROR:\n', error)
+  //          } else {
+  //            console.log('EVENT:\n', result)
+  //            // TODO: this is a better place for update balance than on confirmation
+  //          }
+  //        }
+  //      )
+  //  },
+
+  updateAccount: function () {
+    App.account = web3.eth.coinbase
+    console.log(App.account)
+    $('#t_account').text(App.account)
     return App.account
   },
 
   sendTransaction: function (value) {
     // TODO: value must be <= 18 decimal places -- otherwise fails
-    App.contracts.StakePool.methods.deposit()
-      .send({from: App.account, value: web3.utils.toWei(value, 'ether')})
-      .on('transactionHash', (hash) => {
-        console.log('trx_Hash: ', hash)
-      })
-      .on('receipt', (receipt) => {
-        console.log('Receipt: ', receipt)
-        console.log('event->amount: ',
-          receipt.events.NotifyDeposit.returnValues.amount)
-      })
-      .on('confirmation', (confirmationNumber, receipt) => {
-        // TODO: Why output 24 confirmations ??
-        console.log('Conf: ', confirmationNumber)
-        console.log('receipt: ', receipt)
-        // TODO: have App.getBalance callback/promise turn spinner off
-        if (confirmationNumber === 1 || confirmationNumber === 10) {
-          UI.toggleHiddenElementById('#spinner')
+    App.contracts.StakePool.deployed().then(function (instance) {
+      return instance.deposit(
+        {
+          from: App.account,
+          value: web3.toWei(value, 'ether')
         }
+      )
+    }).then(function (result) {
+      console.log('transaction submitted by user')
+      console.log(result)
+      let b = web3.fromWei(result.logs[0].args.balance.toNumber(), 'ether')
+      $('#s_value').text(b)
+    }).catch(function (err) {
+      console.log('transaction rejected by user')
+      console.log(err.message)
+    })
 
-        // TODO: first attempt to update balance after transaction
-        // this can be removed once event is used in receipt
-        App.getBalance()
-      })
-      .on('error', console.error)
-      .then(function (receipt) {
-        console.log('Then.Receipt:\n', receipt)
-        // does not work here
-        // App.getBalance()
-      })
+    // App.contracts.StakePool.deposit().sendTransaction(
+    //   {
+    //     from: App.account,
+    //     value: web3.toWei(value, 'ether')
+    //   },
+    //   function (err, transactionHash) {
+    //     if (!err) {
+    //       console.log('trx_Hash: ', transactionHash)
+    //     } else {
+    //       console.error(err)
+    //     }
+    //   })
+
+    // .on('receipt', (receipt) => {
+    //     console.log('Receipt: ', receipt)
+    //     console.log('event->amount: ',
+    //       receipt.events.NotifyDeposit.returnValues.amount)
+    //   })
+    //   .on('confirmation', (confirmationNumber, receipt) => {
+    //     // TODO: Why output 24 confirmations ??
+    //     console.log('Conf: ', confirmationNumber)
+    //     console.log('receipt: ', receipt)
+    //     // TODO: have App.getBalance callback/promise turn spinner off
+    //     if (confirmationNumber === 1 || confirmationNumber === 10) {
+    //       UI.toggleHiddenElementById('#spinner')
+    //     }
+
+    //     // TODO: first attempt to update balance after transaction
+    //     // this can be removed once event is used in receipt
+    //     App.getBalance()
+    //   })
+    //   .on('error', console.error)
+    //   .then(function (receipt) {
+    //     console.log('Then.Receipt:\n', receipt)
+    //     // does not work here
+    //     // App.getBalance()
+    //   })
   },
 
   getBalance: function () {
-    App.contracts.StakePool.methods.getBalance().call({
-      from: App.account
-    }).then((value) => {
-      // @value param string
-      console.log('Update Balance: ', value)
-      // value is in wei, display in ether
-      $('#s_value').text(web3.utils.fromWei(value, 'ether'))
-    }).catch((reason) => {
-      console.error('Rejected balance request: ', reason)
-    })
-  },
+    console.log('Default account: ', web3.eth.defaultAccount)
+    console.log('App.account: ', App.account)
+    console.log('Default block: ', web3.eth.defaultBlock)
 
-  initEvents: function () {
-    App.events.Deposit =
-      App.contracts.StakePool.events.NotifyDeposit({},
-        function (error, result) {
-          if (error) {
-            console.error('ERROR:\n', error)
-          } else {
-            console.log('EVENT:\n', result)
-            // TODO: this is a better place for update balance than on confirmation
-          }
-        }
-      )
-        .then(data => {
-          console.log('DepositEvent: ', App.events.Deposit)
-          console.log(data)
-        })
+    App.contracts.StakePool.deployed().then(function (instance) {
+      return instance.getBalance.call()
+    }).then(function (value) {
+      console.log('Value: ', value)
+      let v = web3.fromWei(value.toNumber(), 'ether')
+      console.log('Update Balance: ', v)
+      // value is in wei, display in ether
+      // TODO: update UI with balance
+      $('#s_value').text(v)
+    }).catch(function (err) {
+      console.error('Rejected balance request: ', err)
+    })
+
+    //    App.contracts.StakePool.getBalance().call(
+    //      {from: App.account},
+    //      function (err, result) {
+    //        if (err) {
+    //          console.error('Rejected balance request: ', err)
+    //        } else {
+    //          console.log('Update Balance: ', result)
+    //        // value is in wei, display in ether
+    //        // TODO: update UI with balance
+    //        // $('#s_value').text(web3.utils.fromWei(value, 'ether'))
+    //        }
+    //      }
+    //    )
   },
 
   logNetwork: function () {
@@ -180,6 +196,7 @@ const App = {
         console.error(err)
         return
       }
+      App.network = netId
       switch (netId) {
         case '1':
           console.log('This is mainnet')
@@ -207,12 +224,13 @@ const App = {
     web3.eth.sendTransaction({
       from: App.account,
       to: target,
-      value: web3.utils.toWei(value, 'ether')
-    }).then((result) => {
-      console.log('Promise value: ', result)
-    }).catch((reason) => {
-      // Log the rejection reason
-      console.log('Handle rejected promise (' + reason + ') here.')
+      value: web3.toWei(value, 'ether')
+    }, (err, result) => {
+      if (err) {
+        console.log('Error: ', err)
+      } else {
+        console.log('Success: ', result)
+      }
     })
   },
 
@@ -233,11 +251,10 @@ const App = {
 /* setup related event listeners */
 /* b_ => buttons */
 $('#b_refresh').on('click', () => {
-  App.getActiveAccount()
+  App.updateAccount()
 })
 
 $('#b_trx').on('click', () => {
-  // App.sendEther('1', '0x5755B9Bf6bf9d4bE8Bb36eCC8D212a3C329899ab')
   console.log('click#b_trx')
   console.log($('#i_value').val())
   // default account is null
@@ -248,4 +265,10 @@ $('#b_trx').on('click', () => {
 $('#b_balance').on('click', () => {
   console.log('click#b_balance')
   App.getBalance()
+})
+
+/* test functions */
+$('#b_send').on('click', () => {
+  console.log('click#b_send')
+  App.testSendEther(1, '0xf5cE46d59dbc398d273ab58027D6034A70912184')
 })
