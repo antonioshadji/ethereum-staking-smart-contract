@@ -9,5 +9,10 @@
 - clears contract artifacts and creates new contract.
 - must be used when starting development after having migrated on previous day.  ganache starts clean.
 - contract will be created with same address
+- scripted as npm run migrate
+
+2018-08-07 19:37:10 -0400 
+next action: run test as `truffle test test/StakePool.js`
+current test is working.  write up more tests
 
 

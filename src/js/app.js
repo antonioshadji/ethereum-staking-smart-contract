@@ -75,7 +75,7 @@ const App = {
   },
 
   updateAccount: function () {
-    App.account = web3.eth.coinbase
+    App.account = web3.eth.accounts[0]
     console.log(App.account)
     $('#t_account').text(App.account)
     return App.account
@@ -116,7 +116,9 @@ const App = {
       // TODO: update UI with balance
       $('#s_value').text(v)
     }).catch(function (err) {
-      console.error('Rejected balance request: ', err)
+      console.error('Contract not found. Ensure contract is deployed at 
+      console.error(`Balance request failed: ${err.message}`)
+      $('#s_value').text('0')
     })
   },
 
@@ -165,6 +167,9 @@ const App = {
         case '42':
           console.log('This is the Kovan test network.')
           break
+        case '5777':
+          console.log('This is ganache gui test network on hadji.local')
+          break
         default:
           console.log('This is an unknown network: ', netId)
       }
@@ -199,36 +204,3 @@ const App = {
   }
 
 }
-
-/* setup related event listeners */
-/* b_ => buttons */
-$('#b_refresh').on('click', () => {
-  App.updateAccount()
-})
-
-$('#b_trx').on('click', () => {
-  console.log('click#b_trx')
-  console.log($('#i_value').val())
-  // default account is null
-  // console.log(web3.eth.defaultAccount)
-  App.sendTransaction($('#i_value').val())
-})
-
-$('#b_withdrawal').on('click', () => {
-  console.log('click#b_withdrawal')
-  console.log($('#i_withdrawal').val())
-  // default account is null
-  // console.log(web3.eth.defaultAccount)
-  App.makeWithdrawal($('#i_withdrawal').val())
-})
-
-$('#b_balance').on('click', () => {
-  console.log('click#b_balance')
-  App.getBalance()
-})
-
-/* test functions */
-$('#b_send').on('click', () => {
-  console.log('click#b_send')
-  App.testSendEther(1, '0xf5cE46d59dbc398d273ab58027D6034A70912184')
-})

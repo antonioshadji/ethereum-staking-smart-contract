@@ -44,13 +44,13 @@
             <div class='input-group-prepend'>
               <button class="btn btn-primary" type="button" id="b_trx">Send Transaction</button>
             </div>
-            <input id='i_value' type='text' class='form-control' placeholder='Value in ether' aria-label='Username' aria-describedby='value-send' step='3'>
+            <input id='i_value' type='text' class='form-control' placeholder='Value in ether'  aria-describedby='value-send'>
           </div>
           <div class='input-group mb-3'>
             <div class='input-group-prepend'>
               <button class="btn btn-primary" type="button" id="b_withdrawal">Request Withdrawal</button>
             </div>
-            <input id='i_withdrawal' type='text' class='form-control' placeholder='Value in ether' aria-label='Username' aria-describedby='value-send' step='3'>
+            <input id='i_withdrawal' type='text' class='form-control' placeholder='Value in ether' aria-describedby='value-send'>
             <div class='input-group-append'>
               <button class="btn btn-primary" type="button" id="b_max">Max</button>
             </div>
@@ -80,16 +80,14 @@
       </div> <!-- end row -->
       <hr />
 
-      <div class="alert alert-warning alert-dismissible fade show d-none" role="alert">
+      <div id="warning" class="alert alert-warning alert-dismissible fade show d-none" role="alert">
         <strong>Holy guacamole!</strong> You should check in on some of those fields below.
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
 
-      <div class='text-center'>
-        <img id='spinner' class='d-none' src='img/DoubleRing-1s-200px.svg' alt='spinner' />
-      </div>
+      <img id='spinner'class='text-center d-none'  src='img/DoubleRing-1s-200px.svg' alt='spinner' />
 
     </div> <!-- end container -->
 
@@ -113,8 +111,8 @@
     <script src='js/bootstrap.bundle.min.js'></script>
     <script src='js/web3.min.js'></script>
     <script src='js/truffle-contract.js'></script>
-    <script src='js/app.js'></script>
     <script src='js/ui.js'></script>
+    <script src='js/app.js'></script>
     <script>
       // window waits for everything to load, not just DOM
       // $( window ).on( 'load', readyFn )
