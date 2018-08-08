@@ -1,3 +1,4 @@
 .tern-port
 build/
 node_modules/
+src/js/StakePool.json
