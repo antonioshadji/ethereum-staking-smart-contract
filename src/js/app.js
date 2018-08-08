@@ -14,7 +14,6 @@ const App = {
   contracts: {},
   rpcurl: 'http://127.0.0.1:7545',
   network: null,
-  events: {},
   account: null,
 
   init: function () {
@@ -45,7 +44,7 @@ const App = {
     // define global web3 with provider
     // overwrite web3 with ethereumProvider created with Web3 constructor
     web3 = new Web3(App.web3Provider) // eslint-disable-line no-global-assign
-    console.log('web3 version: ', web3.version)
+    console.log('web3 version: ', web3.version.api)
     App.logNetwork()
     App.updateAccount()
     return App.initContract()
@@ -84,6 +83,7 @@ const App = {
   sendTransaction: function (value) {
     // TODO: value must be <= 18 decimal places -- otherwise fails
     App.contracts.StakePool.deployed().then(function (instance) {
+      // transaction functions are objects of contract instance
       return instance.deposit(
         {
           from: App.account,
@@ -116,7 +116,7 @@ const App = {
       // TODO: update UI with balance
       $('#s_value').text(v)
     }).catch(function (err) {
-      console.error('Contract not found. Ensure contract is deployed at 
+      console.error('Contract not found. Ensure contract is deployed')
       console.error(`Balance request failed: ${err.message}`)
       $('#s_value').text('0')
     })
@@ -125,7 +125,7 @@ const App = {
   makeWithdrawal: function (value) {
     // TODO: how can I add a verification message to Metamask?
     App.contracts.StakePool.deployed().then(function (instance) {
-      return instance.withdrawal(
+      return instance.withdraw(
         web3.toWei(value, 'ether'),
         { from: App.account }
       )
@@ -175,32 +175,6 @@ const App = {
       }
     })
     // netId also available with console.log(web3.version.network)
-  },
-
-  testSendEther: function (value, target) {
-    web3.eth.sendTransaction({
-      from: App.account,
-      to: target,
-      value: web3.toWei(value, 'ether')
-    }, (err, result) => {
-      if (err) {
-        console.log('Error: ', err)
-      } else {
-        console.log('Success: ', result)
-      }
-    })
-  },
-
-  testEvents: function () {
-    // this is App with function
-    // this is Window with =>
-    //
-    // this code only retrieves last event
-    App.contracts.StakePool.getPastEvents('allEvents', { from: App.account },
-      function (error, events) {
-        if (error) console.error('testEvents ERROR: ', error)
-        console.log('testEvents: ', events)
-      })
   }
 
 }

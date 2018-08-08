@@ -39,7 +39,7 @@ contract StakePool {
      * not payable, not receiving funds
      *
      */
-    function withdrawal(uint wdValue) public {
+    function withdraw(uint wdValue) public {
       require(wdValue > 0);
       if (poolBalances[msg.sender] >= wdValue) {
        // open zeppelin sub function to ensure no overflow

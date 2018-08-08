@@ -51,15 +51,15 @@ const UI = {
       App.makeWithdrawal($('#i_withdrawal').val())
     })
 
-    $('#b_balance').on('click', () => {
-      console.log('click#b_balance')
-      App.getBalance()
-    })
-
     /* test functions */
-    $('#b_send').on('click', () => {
-      console.log('click#b_send')
-      App.testSendEther(1, '0xf5cE46d59dbc398d273ab58027D6034A70912184')
-    })
+    // $('#b_balance').on('click', () => {
+    //   console.log('click#b_balance')
+    //   App.getBalance()
+    // })
+
+    // $('#b_send').on('click', () => {
+    //   console.log('click#b_send')
+    //   App.testSendEther(1, '0xf5cE46d59dbc398d273ab58027D6034A70912184')
+    // })
   }
 }
