@@ -20,6 +20,12 @@ contract StakePool {
     */
   mapping(address => uint) poolBalances;
 
+  /** @dev track balances of ether deposited to contract
+    */
+  mapping(address => uint) depositedBalances;
+  mapping(address => UserBalance) stakedBalances;
+
+
   /** @dev trigger notification of deposits
     */
   event NotifyDeposit(
@@ -54,8 +60,8 @@ contract StakePool {
   /** @dev deposit funds to the contract
     */
    function deposit() public payable {
-     poolBalances[msg.sender] += msg.value;
-     emit NotifyDeposit(msg.sender, msg.value, poolBalances[msg.sender]);
+     depositedBalances[msg.sender] += msg.value;
+     emit NotifyDeposit(msg.sender, msg.value, depositedBalances[msg.sender]);
    }
 
    /** @dev withdrawal funds out of pool
@@ -65,17 +71,17 @@ contract StakePool {
      */
     function withdraw(uint wdValue) public {
       require(wdValue > 0);
-      if (poolBalances[msg.sender] >= wdValue) {
+      if (depositedBalances[msg.sender] >= wdValue) {
        // open zeppelin sub function to ensure no overflow
-       uint startBalance = poolBalances[msg.sender];
-       uint newBalance = SafeMath.sub(poolBalances[msg.sender], wdValue);
-       poolBalances[msg.sender] = newBalance;
+       uint startBalance = depositedBalances[msg.sender];
+       uint newBalance = SafeMath.sub(depositedBalances[msg.sender], wdValue);
+       depositedBalances[msg.sender] = newBalance;
        msg.sender.transfer(wdValue);
 
       emit NotifyWithdrawal(
         msg.sender,
         startBalance,
-        poolBalances[msg.sender],
+        depositedBalances[msg.sender],
         wdValue
       );
      }
@@ -85,7 +91,7 @@ contract StakePool {
       * @return uint current value of deposit
       */
     function getBalance() public view returns (uint) {
-      return poolBalances[msg.sender];
+      return depositedBalances[msg.sender];
     }
 
     /** @dev withdraw profits to owner account

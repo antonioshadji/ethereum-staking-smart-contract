@@ -42,17 +42,35 @@
           <hr />
           <div class='input-group mb-3'>
             <div class='input-group-prepend'>
-              <button class="btn btn-primary" type="button" id="b_trx">Send Transaction</button>
+              <button class="btn btn-primary" type="button" id="b_trx">Deposit</button>
             </div>
             <input id='i_value' type='text' class='form-control' placeholder='Value in ether'  aria-describedby='value-send'>
           </div>
           <div class='input-group mb-3'>
             <div class='input-group-prepend'>
-              <button class="btn btn-primary" type="button" id="b_withdrawal">Request Withdrawal</button>
+              <button class="btn btn-primary" type="button" id="b_withdrawal">Withdraw</button>
             </div>
             <input id='i_withdrawal' type='text' class='form-control' placeholder='Value in ether' aria-describedby='value-send'>
             <div class='input-group-append'>
               <button class="btn btn-primary" type="button" id="b_max">Max</button>
+            </div>
+          </div>
+          <div class='input-group mb-3'>
+            <div class='input-group-prepend'>
+              <button class="btn btn-primary" type="button" id="b_stake">Stake</button>
+            </div>
+            <input id='i_stake' type='text' class='form-control' placeholder='Value in ether' aria-describedby='value-send'>
+            <div class='input-group-append'>
+              <button class="btn btn-primary" type="button" id="b_max_stake">Max</button>
+            </div>
+          </div>
+          <div class='input-group mb-3'>
+            <div class='input-group-prepend'>
+              <button class="btn btn-primary" type="button" id="b_ustake">Unstake</button>
+            </div>
+            <input id='i_ustake' type='text' class='form-control' placeholder='Value in ether' aria-describedby='value-send'>
+            <div class='input-group-append'>
+              <button class="btn btn-primary" type="button" id="b_max_ustake">Max</button>
             </div>
           </div>
         </div> <!-- end column -->
@@ -63,16 +81,16 @@
           <table class='table'>
             <tbody>
               <tr>
-                <td>Staked Balance:</td>
+                <td>Deposited Balance:</td>
                 <td><span id='s_value'></span></td>
               </tr>
               <tr>
-                <td>Pending Withdrawal:</td>
+                <td>Staked Balance:</td>
                 <td><span id='s_pw'></span></td>
               </tr>
               <tr>
-                <td>Earnings: </td>
-                <td><span id='s_earn'></span></td>
+                <td></td>
+                <td><span></span></td>
               </tr>
             </tbody>
           </table>

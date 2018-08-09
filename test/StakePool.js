@@ -1,6 +1,7 @@
 /* global after, describe, assert, artifacts, contract, it, web3 */
 // chai is used by default with 'truffle test' command
 // Mocha has an implied describe() block, called the “root suite”).
+// do not use catch in testing code, assert will be marked as passing
 
 const StakePool = artifacts.require('StakePool')
 
@@ -55,14 +56,11 @@ contract('StakePool', function (accounts) {
         }
       )
     }).then(function (transactionObject) {
-      assert.equal(transactionObject.receipt.status, '0x1', 'status failed')
       // event fired and data retrieved from log[]
       let event = transactionObject.logs[0].event
       assert.equal(event, 'NotifyDeposit', 'event not received')
       let amount = transactionObject.logs[0].args.amount
       assert.equal(amount, web3.toWei(1, 'ether'), 'amount not received')
-    }).catch(function (err) {
-      console.error(err)
     })
   })
 
@@ -80,8 +78,6 @@ contract('StakePool', function (accounts) {
       return instance.withdraw(web3.toWei(1, 'ether'), {from: accounts[9]})
     }).then(function (transactionObject) {
       assert.equal(transactionObject.logs.length, 0, 'transaction succeeded')
-    }).catch(function (err) {
-      console.error(err)
     })
   })
 
@@ -95,8 +91,6 @@ contract('StakePool', function (accounts) {
       assert.equal(event, 'NotifyWithdrawal', 'event not received')
       let request = transactionObject.logs[0].args.request
       assert.equal(request, web3.toWei(1, 'ether'), 'request not received')
-    }).catch(function (err) {
-      console.error(err)
     })
   })
 
