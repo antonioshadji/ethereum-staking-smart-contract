@@ -4,8 +4,20 @@ import 'zeppelin-solidity/contracts/math/SafeMath.sol';
 
 /* @title Staking Pool Contract */
 contract StakePool {
+  /** @dev set owner
+    */
+  address owner;
 
-  // track balances of ether deposited to contract
+  /** @dev this struct tracks a users balance
+    *
+    */
+  struct UserBalance {
+    uint blockNumber;
+    uint balance;
+  }
+
+  /** @dev track balances of ether deposited to contract
+    */
   mapping(address => uint) poolBalances;
 
   /** @dev trigger notification of deposits
@@ -23,9 +35,21 @@ contract StakePool {
     uint finalBal,
     uint request);
 
+  /** @dev restrict function to only work when called by owner
+    */
+  modifier onlyOwner() {
+    require(
+      msg.sender == owner,
+      "only owner can call this function"
+    );
+    _;
+  }
+
   /** @dev creates contract
     */
-  constructor() public { }
+  constructor() public {
+    owner = msg.sender;
+  }
 
   /** @dev deposit funds to the contract
     */
@@ -35,9 +59,9 @@ contract StakePool {
    }
 
    /** @dev withdrawal funds out of pool
+     * @param wdValue amount to withdraw
      * TODO: this must be a request for withdrawal as un-staking takes time
      * not payable, not receiving funds
-     *
      */
     function withdraw(uint wdValue) public {
       require(wdValue > 0);
@@ -62,6 +86,14 @@ contract StakePool {
       */
     function getBalance() public view returns (uint) {
       return poolBalances[msg.sender];
+    }
+
+    /** @dev withdraw profits to owner account
+      *
+      */
+    function getProfits() public onlyOwner {
+      // TODO: this is incorrect just testing
+      owner.transfer(address(this).balance);
     }
 }
 
