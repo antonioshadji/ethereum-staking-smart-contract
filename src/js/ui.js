@@ -51,6 +51,10 @@ const UI = {
       App.makeWithdrawal($('#i_withdrawal').val())
     })
 
+    // browser test page only available on test server
+    if (window.location.hostname === 'localhost') {
+      $('#navbarsExampleDefault ul').append('<li class="nav-item"><a class="nav-link" href="/browser.test.html">Test</a></li>')
+    }
     /* test functions */
     // $('#b_balance').on('click', () => {
     //   console.log('click#b_balance')
