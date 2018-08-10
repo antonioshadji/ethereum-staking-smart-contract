@@ -3,29 +3,11 @@ pragma solidity ^0.4.24;
 import 'zeppelin-solidity/contracts/math/SafeMath.sol';
 
 /* @title Staking Pool Contract */
-contract StakePool {
-  /** @dev set owner
-    */
-  address owner;
-  address public stakeContract;
-
-  /** @dev this struct tracks a users balance
-    *
-    */
-  struct UserBalance {
-    uint blockNumber;
-    uint balance;
-  }
-
-  /** @dev track balances of ether deposited to contract
-    */
-  mapping(address => uint) poolBalances;
+contract StakeContract {
 
   /** @dev track balances of ether deposited to contract
     */
   mapping(address => uint) depositedBalances;
-  mapping(address => UserBalance) stakedBalances;
-
 
   /** @dev trigger notification of deposits
     */
@@ -42,28 +24,11 @@ contract StakePool {
     uint finalBal,
     uint request);
 
-  /** @dev restrict function to only work when called by owner
-    */
-  modifier onlyOwner() {
-    require(
-      msg.sender == owner,
-      "only owner can call this function"
-    );
-    _;
-  }
-
   /** @dev creates contract
     */
   constructor() public {
-    owner = msg.sender;
   }
 
-  /**
-    * @dev set staking contract address
-    */
-   function setStakeContract(address _staker) public {
-    stakeContract = _staker;
-   }
   /** @dev deposit funds to the contract
     */
    function deposit() public payable {
@@ -77,7 +42,6 @@ contract StakePool {
      * not payable, not receiving funds
      */
     function withdraw(uint wdValue) public {
-      require(wdValue > 0);
       if (depositedBalances[msg.sender] >= wdValue) {
        // open zeppelin sub function to ensure no overflow
        uint startBalance = depositedBalances[msg.sender];
@@ -99,14 +63,6 @@ contract StakePool {
       */
     function getBalance() public view returns (uint) {
       return depositedBalances[msg.sender];
-    }
-
-    /** @dev withdraw profits to owner account
-      *
-      */
-    function getProfits() public onlyOwner {
-      // TODO: this is incorrect just testing
-      owner.transfer(address(this).balance);
     }
 }
 

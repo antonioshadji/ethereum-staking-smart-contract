@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "mocha",
-    "migrate": "truffle migrate --reset; cp ./build/contracts/StakePool.json ./src/js/."
+    "migrate": "truffle migrate --reset; cp ./build/contracts/Stake*.json ./src/js/."
   },
   "keywords": [
     "ethereum",

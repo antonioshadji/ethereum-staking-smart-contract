@@ -47,27 +47,30 @@ const App = {
     console.log('web3 version: ', web3.version.api)
     App.logNetwork()
     App.updateAccount()
-    return App.initContract()
+    App.initContract('StakeContract')
+    App.initContract('StakePool')
   },
 
-  initContract: function () {
-    $.getJSON('./js/StakePool.json', function (data) {
+  initContract: function (name) {
+    $.getJSON(`./js/${name}.json`, function (data) {
       console.log('Contract Data: ', data)
       // instantiate new contract
       // TODO: update network programattically
-      App.contracts.StakePool = TruffleContract(data)
-      App.contracts.StakePool.setProvider(App.web3Provider)
+      App.contracts[name] = TruffleContract(data)
+      App.contracts[name].setProvider(App.web3Provider)
     })
       .then(function (data) {
-        console.log('getJSON.then')
-        console.log('StakePool:\n', App.contracts.StakePool)
-        UI.enableElemById('#b_trx')
-        App.getBalance()
+        console.log(`getJSON.then:${name}`)
+        console.log(`${name}:\n`, App.contracts[name])
+        if (name === 'StakePool') {
+          UI.enableElemById('#b_trx')
+          App.getBalance()
+        }
       })
       .fail(function (jqxhr, textStatus, error) {
         let err = textStatus + ', ' + error
         console.log('jQuery jqxhr: ', jqxhr)
-        console.log('Failed to find Smart Contract: ' + err)
+        console.log('Failed to find Smart Contract:\n' + err)
         UI.disableElemById('#b_trx')
         return error
       })
@@ -99,6 +102,9 @@ const App = {
       console.log('transaction rejected by user')
       console.log(err.message)
     })
+  },
+
+  setStakeContract: function (address) {
   },
 
   getBalance: function () {
