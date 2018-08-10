@@ -9,6 +9,12 @@ contract StakePool {
   address owner;
   address public stakeContract;
 
+  /** @dev creates contract
+    */
+  constructor() public {
+    owner = msg.sender;
+  }
+
   /** @dev this struct tracks a users balance
     *
     */
@@ -52,11 +58,6 @@ contract StakePool {
     _;
   }
 
-  /** @dev creates contract
-    */
-  constructor() public {
-    owner = msg.sender;
-  }
 
   /**
     * @dev set staking contract address

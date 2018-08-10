@@ -22,19 +22,20 @@ describe('Test Environment', function () {
     assert.isOk(true, 'failed true')
     assert.isNotOk(false, 'failed false')
   })
-})
 
-contract('Test Environment', function (accounts) {
-  it('should have multiple accounts available', function () {
-    assert(accounts.length, 'Must be greater than 0 accounts')
-  })
+  contract('Test Environment', function (accounts) {
+    it('should have multiple accounts available', function () {
+      assert(accounts.length, 'Must be greater than 0 accounts')
+    })
 
-  after(function () {
-    console.log(`accounts available: ${accounts.length}`)
-    for (let i = 0; i < accounts.length; i++) {
-      let balance = web3.eth.getBalance(accounts[i])
-      console.log(`${accounts[i]} ${web3.fromWei(balance, 'ether')}`)
-    }
+    after(function () {
+      let spacer = '      '
+      console.log(`${spacer}accounts available: ${accounts.length}`)
+      for (let i = 0; i < accounts.length; i++) {
+        let balance = web3.eth.getBalance(accounts[i])
+        console.log(`${spacer}${accounts[i]} ${web3.fromWei(balance, 'ether')}`)
+      }
+    })
   })
 })
 
