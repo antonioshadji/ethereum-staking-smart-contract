@@ -104,7 +104,18 @@ const App = {
     })
   },
 
-  setStakeContract: function (address) {
+  // move to test framework
+  setStakeContract: function () {
+    App.contracts.StakeContract.deployed().then(function (ctrInstance) {
+      return ctrInstance.address
+    }).then(function (_address) {
+      return App.contracts.StakePool.deployed().then(function (poolInstance) {
+        return poolInstance.setStakeContract(_address)
+      }).then(function () {
+        // TODO: poolInstance undefined here
+        console.log(App.poolInstance.StakeContract())
+      })
+    })
   },
 
   getBalance: function () {
