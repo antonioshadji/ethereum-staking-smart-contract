@@ -45,6 +45,9 @@ describe('this is the outer describe', function () {
     it('should see variables set in the root suite', function () {
       assert.equal(rootVar, 1000, 'did not see root variables')
     })
+    it('should include key a', function () {
+      assert.property({ a: 1 }, 'a')
+    })
     // this updates variable before any test is run inside THIS describe
     // rootVar = 2000
     // it('should see variables set in the root suite, and updated inside', function () {

@@ -6,21 +6,18 @@ import 'zeppelin-solidity/contracts/math/SafeMath.sol';
 contract StakePool {
   /** @dev set owner
     */
-  address owner;
+  address private owner;
+  /** @dev address of staking contract
+    */
   address public stakeContract;
+  /** @dev hold incoming funds from stake contract
+    */
+  uint private undistributedFunds;
 
   /** @dev creates contract
     */
   constructor() public {
     owner = msg.sender;
-  }
-
-  /** @dev this struct tracks a users balance
-    *
-    */
-  struct UserBalance {
-    uint blockNumber;
-    uint balance;
   }
 
   /** @dev track balances of ether deposited to contract
@@ -29,8 +26,9 @@ contract StakePool {
 
   /** @dev track balances of ether deposited to contract
     */
-  mapping(address => uint) depositedBalances;
-  mapping(address => UserBalance) stakedBalances;
+  mapping(address => uint) private depositedBalances;
+  mapping(address => uint) private stakedBalances;
+  mapping(address => uint) private blockStaked;
 
 
   /** @dev trigger notification of deposits
@@ -59,16 +57,18 @@ contract StakePool {
   }
 
 
-  /**
-    * @dev set staking contract address
+  /** @dev set staking contract address
     */
    function setStakeContract(address _staker) public onlyOwner {
     stakeContract = _staker;
    }
+
   /** @dev deposit funds to the contract
     */
    function deposit() public payable {
-     depositedBalances[msg.sender] += msg.value;
+     uint newBalance = SafeMath.add(depositedBalances[msg.sender], msg.value);
+     depositedBalances[msg.sender] = newBalance;
+
      emit NotifyDeposit(msg.sender, msg.value, depositedBalances[msg.sender]);
    }
 
@@ -102,15 +102,23 @@ contract StakePool {
       return depositedBalances[msg.sender];
     }
 
+    event NotifyProfitDrain(uint previousBal, uint finalBal);
     /** @dev withdraw profits to owner account
-      *
       */
     function getProfits() public onlyOwner {
       // TODO: this is incorrect just testing
+      uint prev = address(this).balance;
       owner.transfer(address(this).balance);
+      uint finl = address(this).balance;
+      emit NotifyProfitDrain(prev, finl);
     }
+
+    /** @dev payable fallback
+      */
+     function () external payable {}
 }
 
+    // external function can not be called within this contract
 
   /* example comments for functions */
     /** @dev Calculates a rectangle's surface and perimeter.
