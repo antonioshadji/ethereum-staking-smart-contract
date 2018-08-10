@@ -1,43 +1,9 @@
-/* global after, describe, assert, artifacts, contract, it, web3 */
+/* global assert, artifacts, contract, it, web3 */
 // chai is used by default with 'truffle test' command
 // Mocha has an implied describe() block, called the “root suite”).
 // do not use catch in testing code, assert will be marked as passing
 
 const StakePool = artifacts.require('StakePool')
-
-describe('Test Environment', function () {
-  it('should have access to web3', function () {
-    assert(web3, 'web3 is not defined')
-  })
-  it('should be using web3 version 0.20.x', function () {
-    let re = /0\.20\.\d/
-    assert(re.test(web3.version.api), 'web3 is not version 0.20.x')
-    // console.log(`web3 version: ${web3.version.api}`)
-  })
-  it('should be using chai', function () {
-    // isNotOk is not available in nodejs assert
-    assert.isNotOk(false, 'this will pass')
-  })
-  it('should allow multiple asserts', function () {
-    assert.isOk(true, 'failed true')
-    assert.isNotOk(false, 'failed false')
-  })
-
-  contract('Test Environment', function (accounts) {
-    it('should have multiple accounts available', function () {
-      assert(accounts.length, 'Must be greater than 0 accounts')
-    })
-
-    after(function () {
-      let spacer = '      '
-      console.log(`${spacer}accounts available: ${accounts.length}`)
-      for (let i = 0; i < accounts.length; i++) {
-        let balance = web3.eth.getBalance(accounts[i])
-        console.log(`${spacer}${accounts[i]} ${web3.fromWei(balance, 'ether')}`)
-      }
-    })
-  })
-})
 
 contract('StakePool', function (accounts) {
   it('should start with 0 balance for given account', function () {

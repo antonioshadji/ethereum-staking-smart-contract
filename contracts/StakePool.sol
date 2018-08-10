@@ -62,7 +62,7 @@ contract StakePool {
   /**
     * @dev set staking contract address
     */
-   function setStakeContract(address _staker) public {
+   function setStakeContract(address _staker) public onlyOwner {
     stakeContract = _staker;
    }
   /** @dev deposit funds to the contract

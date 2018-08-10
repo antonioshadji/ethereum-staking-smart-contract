@@ -1,7 +1,7 @@
-/* global assert, artifacts, contract, it, web3 */
-// chai is used by default with 'truffle test' command
+/* global artifacts, contract, it, web3 */
 // Mocha has an implied describe() block, called the “root suite”).
 
+const assert = require('chai').assert
 const StakePool = artifacts.require('StakePool')
 
 contract('Stakepool External access', function (accounts) {
