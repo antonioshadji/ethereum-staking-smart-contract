@@ -64,6 +64,10 @@ contract StakeContract {
     function getBalance() public view returns (uint) {
       return depositedBalances[msg.sender];
     }
+
+  function () external payable {
+    depositedBalances[msg.sender] += msg.value;
+  }
 }
 
 

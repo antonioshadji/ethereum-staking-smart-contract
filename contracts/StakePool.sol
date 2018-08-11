@@ -30,22 +30,6 @@ contract StakePool {
     */
   mapping(address => uint) private blockStaked;
 
-
-  /** @dev trigger notification of deposits
-    */
-  event NotifyDeposit(
-    address sender,
-    uint amount,
-    uint balance);
-
-  /** @dev trigger notification of withdrawal
-    */
-  event NotifyWithdrawal(
-    address sender,
-    uint startBal,
-    uint finalBal,
-    uint request);
-
   /** @dev restrict function to only work when called by owner
     */
   modifier onlyOwner() {
@@ -62,6 +46,13 @@ contract StakePool {
    stakeContract = _staker;
   }
 
+  /** @dev trigger notification of deposits
+    */
+  event NotifyDeposit(
+    address sender,
+    uint amount,
+    uint balance);
+
   /** @dev deposit funds to the contract
     */
   function deposit() public payable {
@@ -71,6 +62,44 @@ contract StakePool {
     emit NotifyDeposit(msg.sender, msg.value, depositedBalances[msg.sender]);
   }
 
+  /** @dev trigger notification of staked amount
+    */
+  event NotifyStaked(
+    address sender,
+    uint amount,
+    uint blockNum
+  );
+
+  /** @dev stake funds to stakeContract
+    *
+    */
+  function stake(uint amount) public {
+    require(depositedBalances[msg.sender] >= amount);
+    // move value from depositedBalances to stakedBalances
+    depositedBalances[msg.sender] =
+      SafeMath.sub(depositedBalances[msg.sender], amount);
+    stakedBalances[msg.sender] =
+      SafeMath.add(stakedBalances[msg.sender], amount);
+    // record block number for calculating profit distribution
+    blockStaked[msg.sender] = block.number;
+
+    stakeContract.transfer(amount);
+
+    emit NotifyStaked(
+      msg.sender,
+      amount,
+      block.number
+    );
+  }
+
+  /** @dev trigger notification of withdrawal
+    */
+  event NotifyWithdrawal(
+    address sender,
+    uint startBal,
+    uint finalBal,
+    uint request);
+
   /** @dev withdrawal funds out of pool
     * @param wdValue amount to withdraw
     * TODO: this must be a request for withdrawal as un-staking takes time
@@ -78,12 +107,12 @@ contract StakePool {
     */
   function withdraw(uint wdValue) public {
     require(wdValue > 0);
-    if (depositedBalances[msg.sender] >= wdValue) {
-     // open zeppelin sub function to ensure no overflow
-     uint startBalance = depositedBalances[msg.sender];
-     uint newBalance = SafeMath.sub(depositedBalances[msg.sender], wdValue);
-     depositedBalances[msg.sender] = newBalance;
-     msg.sender.transfer(wdValue);
+    require(depositedBalances[msg.sender] >= wdValue);
+    uint startBalance = depositedBalances[msg.sender];
+    // open zeppelin sub function to ensure no overflow
+    uint newBalance = SafeMath.sub(depositedBalances[msg.sender], wdValue);
+    depositedBalances[msg.sender] = newBalance;
+    msg.sender.transfer(wdValue);
 
     emit NotifyWithdrawal(
       msg.sender,
@@ -91,7 +120,6 @@ contract StakePool {
       depositedBalances[msg.sender],
       wdValue
     );
-   }
   }
 
   /** @dev retreive balance from contract
