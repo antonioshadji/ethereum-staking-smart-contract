@@ -30,10 +30,10 @@ contract('Stakepool External access', function (accounts) {
   })
 
   // can also make this an array of objects for multiple input to each test
-  const tests = [ accounts[1], accounts[2] ]
+  const tests = accounts.slice(1, 3)
 
-  tests.forEach(function (test) {
-    it(`should receive ether for account:${test}`, function () {
+  tests.forEach(function (test, index) {
+    it(`should receive ether for account:${index+1}`, function () {
       StakePool.deployed().then(function (instance) {
         return instance.deposit(
           {
