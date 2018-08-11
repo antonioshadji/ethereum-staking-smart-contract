@@ -2,7 +2,7 @@ pragma solidity ^0.4.24;
 
 import 'zeppelin-solidity/contracts/math/SafeMath.sol';
 
-/* @title Staking Pool Contract */
+/* @title Mock Staking Contract for testing Staking Pool Contract */
 contract StakeContract {
 
   /** @dev track balances of ether deposited to contract
