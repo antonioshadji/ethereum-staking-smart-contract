@@ -24,3 +24,8 @@ body {
 {
   cursor: pointer;
 }
+
+/* xa (me) btn button wa width size a */
+.xa-btn-wa {
+  width: 6rem;
+}
