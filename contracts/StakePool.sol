@@ -10,9 +10,6 @@ contract StakePool {
   /** @dev address of staking contract
     */
   address public stakeContract;
-  /** @dev hold incoming funds from stake contract
-    */
-  uint private undistributedFunds;
 
   /** @dev creates contract
     */
@@ -59,63 +56,78 @@ contract StakePool {
 
   /** @dev set staking contract address
     */
-   function setStakeContract(address _staker) public onlyOwner {
-    stakeContract = _staker;
-   }
+  function setStakeContract(address _staker) public onlyOwner {
+   stakeContract = _staker;
+  }
 
   /** @dev deposit funds to the contract
     */
-   function deposit() public payable {
-     uint newBalance = SafeMath.add(depositedBalances[msg.sender], msg.value);
+  function deposit() public payable {
+    uint newBalance = SafeMath.add(depositedBalances[msg.sender], msg.value);
+    depositedBalances[msg.sender] = newBalance;
+
+    emit NotifyDeposit(msg.sender, msg.value, depositedBalances[msg.sender]);
+  }
+
+  /** @dev withdrawal funds out of pool
+    * @param wdValue amount to withdraw
+    * TODO: this must be a request for withdrawal as un-staking takes time
+    * not payable, not receiving funds
+    */
+  function withdraw(uint wdValue) public {
+    require(wdValue > 0);
+    if (depositedBalances[msg.sender] >= wdValue) {
+     // open zeppelin sub function to ensure no overflow
+     uint startBalance = depositedBalances[msg.sender];
+     uint newBalance = SafeMath.sub(depositedBalances[msg.sender], wdValue);
      depositedBalances[msg.sender] = newBalance;
+     msg.sender.transfer(wdValue);
 
-     emit NotifyDeposit(msg.sender, msg.value, depositedBalances[msg.sender]);
+    emit NotifyWithdrawal(
+      msg.sender,
+      startBalance,
+      depositedBalances[msg.sender],
+      wdValue
+    );
    }
+  }
 
-   /** @dev withdrawal funds out of pool
-     * @param wdValue amount to withdraw
-     * TODO: this must be a request for withdrawal as un-staking takes time
-     * not payable, not receiving funds
-     */
-    function withdraw(uint wdValue) public {
-      require(wdValue > 0);
-      if (depositedBalances[msg.sender] >= wdValue) {
-       // open zeppelin sub function to ensure no overflow
-       uint startBalance = depositedBalances[msg.sender];
-       uint newBalance = SafeMath.sub(depositedBalances[msg.sender], wdValue);
-       depositedBalances[msg.sender] = newBalance;
-       msg.sender.transfer(wdValue);
+  /** @dev retreive balance from contract
+    * @return uint current value of deposit
+    */
+  function getBalance() public view returns (uint) {
+    return depositedBalances[msg.sender];
+  }
 
-      emit NotifyWithdrawal(
-        msg.sender,
-        startBalance,
-        depositedBalances[msg.sender],
-        wdValue
-      );
-     }
-    }
+  event NotifyProfitDrain(uint previousBal, uint finalBal);
+  /** @dev withdraw profits to owner account
+    */
+  function getProfits() public onlyOwner {
+    // TODO: this is incorrect just testing
+    uint previous = address(this).balance;
+    owner.transfer(address(this).balance);
+    uint finalBal = address(this).balance;
+    emit NotifyProfitDrain(previous, finalBal);
+  }
 
-    /** @dev retreive balance from contract
-      * @return uint current value of deposit
-      */
-    function getBalance() public view returns (uint) {
-      return depositedBalances[msg.sender];
-    }
+  /** @dev hold incoming funds from stake contract
+    */
+  uint private undistributedFunds;
 
-    event NotifyProfitDrain(uint previousBal, uint finalBal);
-    /** @dev withdraw profits to owner account
-      */
-    function getProfits() public onlyOwner {
-      // TODO: this is incorrect just testing
-      uint prev = address(this).balance;
-      owner.transfer(address(this).balance);
-      uint finl = address(this).balance;
-      emit NotifyProfitDrain(prev, finl);
-    }
+  /** @dev owner only may retreive undistributedFunds value
+    */
+  function getUndistributedFundsValue() public view onlyOwner returns (uint) {
+    return undistributedFunds;
+  }
 
-    /** @dev payable fallback
-      */
-     function () external payable {}
+  /** @dev payable fallback
+    * receive funds and keep track of totals
+    * it is assumed that only funds received will be from stakeContract
+    */
+  function () external payable {
+    // using smallest possible code to make it under 2300 wei gas limit
+    undistributedFunds += msg.value;
+  }
 }
 
     // external function can not be called within this contract

@@ -1,4 +1,4 @@
-/* global before, artifacts, contract, it */
+/* global web3, before, artifacts, contract, it */
 // Mocha has an implied describe() block, called the “root suite”).
 
 const assert = require('chai').assert
@@ -43,5 +43,21 @@ contract('StakePool / StakeContract interaction', function (accounts) {
     assert.equal(a.length, 42, 'addresses are 42 character strings')
     // console.log(a)
     // console.log(stak.address)
+  })
+
+  it('should be able to receive funds from any source', function () {
+    let result =
+      web3.eth.sendTransaction({
+        from: accounts[9],
+        to: pool.address,
+        value: web3.toWei(1, 'ether')
+      })
+    assert.isOk(result, 'result returned')
+    assert.equal(result.length, 66, 'result is transaction hash')
+  })
+  it('should be able to check undistributed funds after receiving ether', function () {
+    pool.getUndistributedFundsValue().then(function (value) {
+      assert.equal(value, web3.toWei(1, 'ether'))
+    })
   })
 })
