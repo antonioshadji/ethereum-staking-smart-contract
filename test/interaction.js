@@ -30,10 +30,6 @@ contract('StakePool / StakeContract interaction', function (accounts) {
     assert.isOk(stak.address, 'StakeContract has no address')
   })
 
-  it('should be able to set StakeContract address', function () {
-    pool.setStakeContract(stak.address)
-  })
-
   it('should be able to check stake address with getter', async function () {
     // stakeContract is name of public global variable in StakePool contract
     // the compiler created getter, returns a Promise - use async/await
@@ -41,8 +37,13 @@ contract('StakePool / StakeContract interaction', function (accounts) {
     assert.isOk(a, 'did not get a value')
     assert.typeOf(a, 'string', 'addresses are strings')
     assert.equal(a.length, 42, 'addresses are 42 character strings')
-    // console.log(a)
+    assert.notEqual(parseInt(a, 16), 0, 'address is not zero address')
+    console.log('\t>', a)
     // console.log(stak.address)
+  })
+
+  it('should be able to set StakeContract address', function () {
+    pool.setStakeContract(stak.address)
   })
 
   it('should be able to receive funds from any source', function () {

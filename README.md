@@ -19,7 +19,7 @@ This contract is designed to be a framework for staking ether as a group.  Since
 [ ] Owner must be able to trigger a profit distribution
 
 ## Contract functions
-[ ] Must be able to receive funds from staking pool
+[x] Must be able to receive funds from staking pool
 [x] Must track users deposits by address
 [ ] Must track users staked deposits by address
 [ ] Must calculate profit share for each user

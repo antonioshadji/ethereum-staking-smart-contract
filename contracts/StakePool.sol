@@ -13,18 +13,21 @@ contract StakePool {
 
   /** @dev creates contract
     */
-  constructor() public {
+  constructor(address _stakeContract) public {
     owner = msg.sender;
+    stakeContract = _stakeContract;
   }
 
   /** @dev track balances of ether deposited to contract
     */
-  mapping(address => uint) poolBalances;
-
-  /** @dev track balances of ether deposited to contract
-    */
   mapping(address => uint) private depositedBalances;
+
+  /** @dev track balances of ether staked to contract
+    */
   mapping(address => uint) private stakedBalances;
+
+  /** @dev track block.number when ether was staked
+    */
   mapping(address => uint) private blockStaked;
 
 
@@ -52,7 +55,6 @@ contract StakePool {
     );
     _;
   }
-
 
   /** @dev set staking contract address
     */
