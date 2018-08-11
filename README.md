@@ -1,5 +1,6 @@
 # Staking Pool Smart Contract.
-In the near future, it is expected that Ethereum will move to a Proof of Stake model.  The details are uncertain, but it is likely that there may be an opportunity to organize a staking pool as a business opportunity.  
+In the near future, it is expected that Ethereum will move to a Proof of Stake model.  The details are uncertain, but it is likely that there is an opportunity to organize a staking pool as a business opportunity.
+
 This contract is designed to be a framework for staking ether as a group.  Since details are few at this time, I have created a dummy contract that will act as the staking contract.  The staking pool contract will manage users deposits and distribution of profits.
 
 ## Users functions
