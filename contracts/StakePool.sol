@@ -11,6 +11,9 @@ contract StakePool {
     */
   address public stakeContract;
 
+  /** @dev track total staked amount
+    */
+  uint totalStaked;
   /** @dev creates contract
     */
   constructor(address _stakeContract) public {
@@ -29,6 +32,9 @@ contract StakePool {
   /** @dev track block.number when ether was staked
     */
   mapping(address => uint) private blockStaked;
+  /** @dev track block.number when ether was unstaked
+    */
+  mapping(address => uint) private blockUnstaked;
 
   /** @dev restrict function to only work when called by owner
     */
@@ -75,6 +81,8 @@ contract StakePool {
     */
   function stake(uint amount) public {
     require(depositedBalances[msg.sender] >= amount);
+    // track total staked
+    totalStaked = SafeMath.add(totalStaked, amount);
     // move value from depositedBalances to stakedBalances
     depositedBalances[msg.sender] =
       SafeMath.sub(depositedBalances[msg.sender], amount);
@@ -88,6 +96,30 @@ contract StakePool {
     emit NotifyStaked(
       msg.sender,
       amount,
+      block.number
+    );
+  }
+
+  /** @dev unstake funds from stakeContract
+    *
+    */
+  function unstake(uint amount) public {
+    require(stakedBalances[msg.sender] >= amount);
+    // track total staked
+    totalStaked = SafeMath.sub(totalStaked, amount);
+    // move value from depositedBalances to stakedBalances
+    depositedBalances[msg.sender] =
+      SafeMath.add(depositedBalances[msg.sender], amount);
+    stakedBalances[msg.sender] =
+      SafeMath.sub(stakedBalances[msg.sender], amount);
+    // record block number for calculating profit distribution
+    blockUnstaked[msg.sender] = block.number;
+
+    stakeContract.withdraw(amount);
+
+    emit NotifyStaked(
+      msg.sender,
+      -amount,
       block.number
     );
   }
