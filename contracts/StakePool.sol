@@ -1,24 +1,27 @@
 pragma solidity ^0.4.24;
 
 import 'zeppelin-solidity/contracts/math/SafeMath.sol';
+import './StakeContract.sol';
 
 /* @title Staking Pool Contract */
 contract StakePool {
   /** @dev set owner
     */
-  address private owner;
+  address private _owner;
   /** @dev address of staking contract
     */
-  address public stakeContract;
+  address public _stakeContract;
+  StakeContract _sc;
 
   /** @dev track total staked amount
     */
   uint totalStaked;
   /** @dev creates contract
     */
-  constructor(address _stakeContract) public {
-    owner = msg.sender;
-    stakeContract = _stakeContract;
+  constructor(address stakeContractAddress) public {
+    _owner = msg.sender;
+    _stakeContract = stakeContractAddress;
+    _sc = StakeContract(_stakeContract);
   }
 
   /** @dev track balances of ether deposited to contract
@@ -40,7 +43,7 @@ contract StakePool {
     */
   modifier onlyOwner() {
     require(
-      msg.sender == owner,
+      msg.sender == _owner,
       "only owner can call this function"
     );
     _;
@@ -48,8 +51,9 @@ contract StakePool {
 
   /** @dev set staking contract address
     */
-  function setStakeContract(address _staker) public onlyOwner {
-   stakeContract = _staker;
+  function setStakeContract(address newStaker) public onlyOwner {
+   _stakeContract = newStaker;
+   _sc = StakeContract(_stakeContract);
   }
 
   /** @dev trigger notification of deposits
@@ -70,11 +74,36 @@ contract StakePool {
 
   /** @dev trigger notification of staked amount
     */
-  event NotifyStaked(
+  event NotifySentStake(
     address sender,
     uint amount,
-    uint blockNum
+    uint blockNum,
+    uint poolBal
   );
+
+  /** @dev stake funds to stakeContract
+    *
+    */
+  function stakeTwo() public payable {
+    // stakedBalances[msg.sender] =
+    //   SafeMath.add(stakedBalances[msg.sender], msg.value);
+
+    // // track total staked
+    // totalStaked = SafeMath.add(totalStaked, msg.value);
+
+    // // record block number for calculating profit distribution
+    // blockStaked[msg.sender] = block.number;
+
+    _sc.deposit();
+    // stakeContract.transfer(msg.value);
+
+    emit NotifySentStake(
+      msg.sender,
+      msg.value,
+      block.number,
+      address(this).balance
+    );
+  }
 
   /** @dev stake funds to stakeContract
     *
@@ -91,12 +120,13 @@ contract StakePool {
     // record block number for calculating profit distribution
     blockStaked[msg.sender] = block.number;
 
-    stakeContract.transfer(amount);
+    _stakeContract.transfer(amount);
 
-    emit NotifyStaked(
+    emit NotifySentStake(
       msg.sender,
       amount,
-      block.number
+      block.number,
+      address(this).balance
     );
   }
 
@@ -115,12 +145,17 @@ contract StakePool {
     // record block number for calculating profit distribution
     blockUnstaked[msg.sender] = block.number;
 
-    stakeContract.withdraw(amount);
+    // TODO: compile error ?
+    // /mnt/projects/ethereum/learn/consensys_academy/final_project/contracts/StakePool.sol:140:5: TypeError: Member "withdraw" not found or not visible after argument-dependent lookup in address
+    // stakeContract.withdraw(amount);
+    // ^--------------------^
+   // stakeContract.withdraw(amount);
 
-    emit NotifyStaked(
+    emit NotifySentStake(
       msg.sender,
       -amount,
-      block.number
+      block.number,
+      address(this).balance
     );
   }
 
@@ -161,13 +196,18 @@ contract StakePool {
     return depositedBalances[msg.sender];
   }
 
+
+  function getPoolBalance() public view returns (uint) {
+    return _sc.getBalance();
+  }
+
   event NotifyProfitDrain(uint previousBal, uint finalBal);
   /** @dev withdraw profits to owner account
     */
   function getProfits() public onlyOwner {
     // TODO: this is incorrect just testing
     uint previous = address(this).balance;
-    owner.transfer(address(this).balance);
+    _owner.transfer(address(this).balance);
     uint finalBal = address(this).balance;
     emit NotifyProfitDrain(previous, finalBal);
   }
