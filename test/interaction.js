@@ -1,11 +1,12 @@
 /* global web3, before, artifacts, contract, it */
 // Mocha has an implied describe() block, called the “root suite”).
 
+const path = require('path')
 const assert = require('chai').assert
 const StakePool = artifacts.require('StakePool')
 const StakeContract = artifacts.require('StakeContract')
 
-contract('StakePool / StakeContract interaction', function (accounts) {
+contract(`StakePool / StakeContract interaction: ${path.basename(__filename)}`, function (accounts) {
   let pool = null
   let stak = null
   before('setup contract instances', async function () {
@@ -92,47 +93,6 @@ contract('StakePool / StakeContract interaction', function (accounts) {
       web3.eth.getBalance(pool.address).valueOf(),
       web3.toWei(etherAmount + 1, 'ether'),
       `account balance is not ${etherAmount + 1} ether`
-    )
-  })
-
-  it.skip(`should be able to stake ether from account with deposits`, function () {
-    pool.stake(web3.toWei(1, 'ether'), {from: accounts[1]})
-      .then(function (trxObj) {
-        assert.isOk(trxObj.logs)
-        assert.equal(trxObj.logs[0].args.amount, web3.toWei('1', 'ether'),
-          'amount staked is not 1 ether')
-      })
-  })
-
-  it.skip(`should be able to stake ether from account with deposits`,
-    function () {
-      pool.stake(web3.toWei(1, 'ether'), {from: accounts[1], gas: '3000000'})
-        .then(function (trxObj) {
-          console.log('trxObj:\n', trxObj)
-        })
-    }
-  )
-
-  it(`should be able to send ether to StakeContract`,
-    function () {
-      pool.stake2(
-        {
-          from: accounts[1],
-          value: web3.toWei(1, 'ether'),
-          gas: '100000'
-        })
-        .then(function (trxObj) {
-          console.log('trxObj:\n', trxObj)
-          assert.exists(trxObj, 'nothing returned')
-        })
-    }
-  )
-
-  it(`should show a balance in StakeContract`, function () {
-    assert.equal(
-      web3.eth.getBalance(stak.address).valueOf(),
-      web3.toWei(1, 'ether'),
-      'account balance is not as expected'
     )
   })
 })
