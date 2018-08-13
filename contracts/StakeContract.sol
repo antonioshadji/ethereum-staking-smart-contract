@@ -11,12 +11,7 @@ contract StakeContract {
 
   /** @dev trigger notification of deposits
     */
-  event NotifyReceivedStake(
-    address sender,
-    uint amount,
-    uint balance);
-
-  event NotifyReceivedEther(
+  event NotifyDeposit(
     address sender,
     uint amount,
     uint balance);
@@ -38,10 +33,7 @@ contract StakeContract {
     */
    function deposit() public payable {
      depositedBalances[msg.sender] += msg.value;
-     emit NotifyReceivedStake(
-       msg.sender,
-       msg.value,
-       depositedBalances[msg.sender]);
+     emit NotifyDeposit(msg.sender, msg.value, depositedBalances[msg.sender]);
    }
 
    /** @dev withdrawal funds out of pool
@@ -74,12 +66,7 @@ contract StakeContract {
     }
 
   function () external payable {
-    // depositedBalances[msg.sender] += msg.value;
-    emit NotifyReceivedEther(
-      msg.sender,
-      msg.value,
-      address(this).balance
-    );
+    depositedBalances[msg.sender] += msg.value;
   }
 }
 

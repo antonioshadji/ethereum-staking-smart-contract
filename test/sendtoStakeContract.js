@@ -58,12 +58,8 @@ contract('StakePool / StakeContract interaction', function (accounts) {
       trxObj.logs.forEach((e, i) => {
         console.log(`log #${i}:\n`)
         console.dir(e)
+        console.log(`amount: ${trxObj.logs[i].args.amount.valueOf()}`)
       })
-      if (trxObj.logs.length >= 1) {
-        console.log(`amount: ${trxObj.logs[0].args.amount.valueOf()}`)
-        console.log(`blockNum: ${trxObj.logs[0].args.blockNum.valueOf()}`)
-        console.log(`poolBal: ${trxObj.logs[0].args.poolBal.valueOf()}`)
-      }
     })
   })
 

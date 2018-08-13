@@ -7,21 +7,19 @@ import './StakeContract.sol';
 contract StakePool {
   /** @dev set owner
     */
-  address private _owner;
+  address private owner;
   /** @dev address of staking contract
     */
-  address public _stakeContract;
-  StakeContract _sc;
+  address public stakeContract;
 
   /** @dev track total staked amount
     */
   uint totalStaked;
   /** @dev creates contract
     */
-  constructor(address stakeContractAddress) public {
-    _owner = msg.sender;
-    _stakeContract = stakeContractAddress;
-    _sc = StakeContract(_stakeContract);
+  constructor(address _stakeContract) public {
+    owner = msg.sender;
+    stakeContract = _stakeContract;
   }
 
   /** @dev track balances of ether deposited to contract
@@ -43,7 +41,7 @@ contract StakePool {
     */
   modifier onlyOwner() {
     require(
-      msg.sender == _owner,
+      msg.sender == owner,
       "only owner can call this function"
     );
     _;
@@ -51,9 +49,8 @@ contract StakePool {
 
   /** @dev set staking contract address
     */
-  function setStakeContract(address newStaker) public onlyOwner {
-   _stakeContract = newStaker;
-   _sc = StakeContract(_stakeContract);
+  function setStakeContract(address _staker) public onlyOwner {
+   stakeContract = _staker;
   }
 
   /** @dev trigger notification of deposits
@@ -74,34 +71,34 @@ contract StakePool {
 
   /** @dev trigger notification of staked amount
     */
-  event NotifySentStake(
+  event NotifyStaked(
     address sender,
     uint amount,
-    uint blockNum,
-    uint poolBal
+    uint blockNum
   );
 
   /** @dev stake funds to stakeContract
     *
     */
+   StakeContract sc;
   function stakeTwo() public payable {
     // stakedBalances[msg.sender] =
-    //   SafeMath.add(stakedBalances[msg.sender], msg.value);
+      // SafeMath.add(stakedBalances[msg.sender], msg.value);
 
-    // // track total staked
+    // track total staked
     // totalStaked = SafeMath.add(totalStaked, msg.value);
 
-    // // record block number for calculating profit distribution
+    // record block number for calculating profit distribution
     // blockStaked[msg.sender] = block.number;
 
-    _sc.deposit();
+    sc = StakeContract(stakeContract);
+    sc.deposit();
     // stakeContract.transfer(msg.value);
 
-    emit NotifySentStake(
+    emit NotifyStaked(
       msg.sender,
       msg.value,
-      block.number,
-      address(this).balance
+      block.number
     );
   }
 
@@ -120,13 +117,12 @@ contract StakePool {
     // record block number for calculating profit distribution
     blockStaked[msg.sender] = block.number;
 
-    _stakeContract.transfer(amount);
+    stakeContract.transfer(amount);
 
-    emit NotifySentStake(
+    emit NotifyStaked(
       msg.sender,
       amount,
-      block.number,
-      address(this).balance
+      block.number
     );
   }
 
@@ -151,11 +147,10 @@ contract StakePool {
     // ^--------------------^
    // stakeContract.withdraw(amount);
 
-    emit NotifySentStake(
+    emit NotifyStaked(
       msg.sender,
       -amount,
-      block.number,
-      address(this).balance
+      block.number
     );
   }
 
@@ -196,18 +191,13 @@ contract StakePool {
     return depositedBalances[msg.sender];
   }
 
-
-  function getPoolBalance() public view returns (uint) {
-    return _sc.getBalance();
-  }
-
   event NotifyProfitDrain(uint previousBal, uint finalBal);
   /** @dev withdraw profits to owner account
     */
   function getProfits() public onlyOwner {
     // TODO: this is incorrect just testing
     uint previous = address(this).balance;
-    _owner.transfer(address(this).balance);
+    owner.transfer(address(this).balance);
     uint finalBal = address(this).balance;
     emit NotifyProfitDrain(previous, finalBal);
   }
