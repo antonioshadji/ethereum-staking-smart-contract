@@ -1,6 +1,6 @@
-/* global before, web3, artifacts, contract, it */
+/* global after, before, web3, artifacts, contract, it */
 // Mocha has an implied describe() block, called the “root suite”).
-
+const fs = require('fs')
 const assert = require('chai').assert
 const StakePool = artifacts.require('StakePool')
 const StakeContract = artifacts.require('StakeContract')
@@ -8,14 +8,18 @@ const StakeContract = artifacts.require('StakeContract')
 contract('StakePool / StakeContract interaction', function (accounts) {
   let poolAddress = null
   let stakeAddress = null
+  let log = null
   before('show contract addresses', function () {
+    let fn = (new Date()).toISOString()
+    fn = fn.slice(11, 19).replace(/:/g, '').concat('.log')
+    log = fs.createWriteStream(`./test/logs/${fn}`)
     StakeContract.deployed().then(function (instance) {
       stakeAddress = instance.address
-      console.log(`StakeContract: ${instance.address}`)
+      log.write(`StakeContract: ${instance.address}\n`)
     })
     StakePool.deployed().then(function (instance) {
       poolAddress = instance.address
-      console.log(`StakePool: ${instance.address}`)
+      log.write(`StakePool: ${instance.address}\n`)
     })
   })
 
@@ -44,22 +48,10 @@ contract('StakePool / StakeContract interaction', function (accounts) {
           gas: '200000'
         })
     }).then(function (trxObj) {
-      console.log(`trxObj:\n`)
-      console.dir(trxObj)
-      console.log(`EOF trxObj`)
-
-      // console.log(`receipt logs count: ${trxObj.receipt.logs.length}`)
-      // trxObj.receipt.logs.forEach((e, i) => {
-      //   console.log(`Rlog #${i}:\n`)
-      //   console.dir(e)
-      // })
-
-      console.log(`logs count: ${trxObj.logs.length}`)
-      trxObj.logs.forEach((e, i) => {
-        console.log(`log #${i}:\n`)
-        console.dir(e)
-        console.log(`amount: ${trxObj.logs[i].args.amount.valueOf()}`)
-      })
+      log.write(JSON.stringify(trxObj, null, 2))
+      assert.equal(trxObj.logs.length, 2, 'there were not only 2 events fired')
+      assert.equal(trxObj.logs[0].event, 'NotifyDeposit')
+      assert.equal(trxObj.logs[1].event, 'NotifyStaked')
     })
   })
 
@@ -79,22 +71,7 @@ contract('StakePool / StakeContract interaction', function (accounts) {
     )
   })
 
-  it.skip('StakeContract should now have balance of 1 ether for StakePool', function () {
-    return StakeContract.deployed().then(function (instance) {
-      return instance.getPoolBalance()
-    }).then(function (balance) {
-      assert.equal(balance.valueOf(), web3.toWei(1, 'ether'),
-        'account balance is not 1 ether')
-    })
-  })
-
-  it.skip(`should show a balance of 1 ether in StakeContract`, function () {
-    StakeContract.deployed().then(function (instance) {
-      assert.equal(
-        web3.eth.getBalance(instance.address).valueOf(),
-        web3.toWei(1, 'ether'),
-        'account balance is not as expected'
-      )
-    })
+  after('finished', function () {
+    log.end()
   })
 })
