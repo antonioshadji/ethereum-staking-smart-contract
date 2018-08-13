@@ -78,7 +78,7 @@ contract StakePool {
   );
 
   /** @dev stake funds to stakeContract
-    *
+    * http://solidity.readthedocs.io/en/latest/control-structures.html#external-function-calls
     */
    StakeContract sc;
   function stakeTwo() public payable {
@@ -92,7 +92,7 @@ contract StakePool {
     // blockStaked[msg.sender] = block.number;
 
     sc = StakeContract(stakeContract);
-    sc.deposit();
+    sc.deposit.value(msg.value)();
     // stakeContract.transfer(msg.value);
 
     emit NotifyStaked(
