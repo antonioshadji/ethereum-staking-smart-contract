@@ -81,47 +81,23 @@ contract StakePool {
     * http://solidity.readthedocs.io/en/latest/control-structures.html#external-function-calls
     */
    StakeContract sc;
-  function stakeTwo() public payable {
-    // stakedBalances[msg.sender] =
-      // SafeMath.add(stakedBalances[msg.sender], msg.value);
+  function stake() public payable {
+    stakedBalances[msg.sender] =
+      SafeMath.add(stakedBalances[msg.sender], msg.value);
 
     // track total staked
-    // totalStaked = SafeMath.add(totalStaked, msg.value);
+    totalStaked = SafeMath.add(totalStaked, msg.value);
 
     // record block number for calculating profit distribution
-    // blockStaked[msg.sender] = block.number;
+    blockStaked[msg.sender] = block.number;
 
     sc = StakeContract(stakeContract);
+    // this is how to send ether with a call to an external contract
     sc.deposit.value(msg.value)();
-    // stakeContract.transfer(msg.value);
 
     emit NotifyStaked(
       msg.sender,
       msg.value,
-      block.number
-    );
-  }
-
-  /** @dev stake funds to stakeContract
-    *
-    */
-  function stake(uint amount) public {
-    require(depositedBalances[msg.sender] >= amount);
-    // track total staked
-    totalStaked = SafeMath.add(totalStaked, amount);
-    // move value from depositedBalances to stakedBalances
-    depositedBalances[msg.sender] =
-      SafeMath.sub(depositedBalances[msg.sender], amount);
-    stakedBalances[msg.sender] =
-      SafeMath.add(stakedBalances[msg.sender], amount);
-    // record block number for calculating profit distribution
-    blockStaked[msg.sender] = block.number;
-
-    stakeContract.transfer(amount);
-
-    emit NotifyStaked(
-      msg.sender,
-      amount,
       block.number
     );
   }

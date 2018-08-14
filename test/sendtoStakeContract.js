@@ -41,7 +41,7 @@ contract('StakePool / StakeContract interaction', function (accounts) {
 
   it(`should be able to send ether to StakeContract`, function () {
     StakePool.deployed().then(function (instance) {
-      return instance.stakeTwo(
+      return instance.stake(
         {
           from: accounts[1],
           value: web3.toWei(1, 'ether'),
