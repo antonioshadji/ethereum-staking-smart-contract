@@ -41,14 +41,16 @@ contract(`StakePool: ${p.basename(__filename)}`, function (accounts) {
     })
   })
 
-  it.skip('should NOT be able to return ether to wrong account (fails as expected)', function () {
+  it('should NOT be able to return ether to wrong account (fails as expected)', async function () {
     try {
-      return StakePool.deployed().then(function (instance) {
+      await StakePool.deployed().then(function (instance) {
         return instance.withdraw(web3.toWei(1, 'ether'), {from: accounts[9]})
       })
     } catch (err) {
       assert.exists(err)
+      return
     }
+    assert.fail('no error detected')
   })
 
   it('should be able to return ether to correct account, and emit event', function () {
