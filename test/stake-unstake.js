@@ -1,11 +1,12 @@
 /* global after, before, web3, artifacts, contract, it */
 // Mocha has an implied describe() block, called the “root suite”).
 const fs = require('fs')
+const p = require('path')
 const assert = require('chai').assert
 const StakePool = artifacts.require('StakePool')
 const StakeContract = artifacts.require('StakeContract')
 
-contract('StakePool / StakeContract interaction', function (accounts) {
+contract(`stake / unstake functions: ${p.basename(__filename)}`, function (accounts) {
   let poolAddress = null
   let stakeAddress = null
   let log = null
