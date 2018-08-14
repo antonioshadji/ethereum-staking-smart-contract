@@ -4,6 +4,7 @@ import 'zeppelin-solidity/contracts/math/SafeMath.sol';
 
 /* @title Mock Staking Contract for testing Staking Pool Contract */
 contract StakeContract {
+  using SafeMath for uint;
 
   /** @dev track balances of ether deposited to contract
     */
@@ -38,16 +39,16 @@ contract StakeContract {
 
    /** @dev withdrawal funds out of pool
      * @param wdValue amount to withdraw
-     * TODO: this must be a request for withdrawal as un-staking takes time
      * not payable, not receiving funds
      */
-    function withdraw(uint wdValue) public {
-      if (depositedBalances[msg.sender] >= wdValue) {
-       // open zeppelin sub function to ensure no overflow
-       uint startBalance = depositedBalances[msg.sender];
-       uint newBalance = SafeMath.sub(depositedBalances[msg.sender], wdValue);
-       depositedBalances[msg.sender] = newBalance;
-       msg.sender.transfer(wdValue);
+    function withdraw(uint wdValue, address payee) public {
+      require(depositedBalances[msg.sender] >= wdValue);
+      // open zeppelin sub function to ensure no overflow
+      uint startBalance = depositedBalances[msg.sender];
+      depositedBalances[msg.sender] = depositedBalances[msg.sender].sub(wdValue);
+
+      // msg.sender.transfer(wdValue);
+      payee.transfer(wdValue);
 
       emit NotifyWithdrawal(
         msg.sender,
@@ -55,7 +56,6 @@ contract StakeContract {
         depositedBalances[msg.sender],
         wdValue
       );
-     }
     }
 
     /** @dev retreive balance from contract

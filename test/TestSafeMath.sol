@@ -31,10 +31,10 @@ contract TestSafeMath {
     Assert.equal(SafeMath.sub(var1, var2), 80, 'first - second');
   }
 
-  // function testOrderSubNeg() public {
-  //   uint var1 = 10;
-  //   uint var2 = 20;
-  //   Assert.equal(SafeMath.sub(var1, var2), -10, 'first - second');
-  // }
+  function testOrderSubChain() public {
+    uint var1 = 10;
+    uint var2 = 20;
+    Assert.equal(var1.sub(var2), -10, 'first - second');
+  }
 }
 

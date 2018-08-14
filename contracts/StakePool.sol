@@ -5,12 +5,14 @@ import './StakeContract.sol';
 
 /* @title Staking Pool Contract */
 contract StakePool {
+  using SafeMath for uint;
   /** @dev set owner
     */
   address private owner;
   /** @dev address of staking contract
     */
   address public stakeContract;
+  StakeContract sc;
 
   /** @dev track total staked amount
     */
@@ -20,6 +22,7 @@ contract StakePool {
   constructor(address _stakeContract) public {
     owner = msg.sender;
     stakeContract = _stakeContract;
+    sc = StakeContract(stakeContract);
   }
 
   /** @dev track balances of ether deposited to contract
@@ -51,6 +54,7 @@ contract StakePool {
     */
   function setStakeContract(address _staker) public onlyOwner {
    stakeContract = _staker;
+   sc = StakeContract(stakeContract);
   }
 
   /** @dev trigger notification of deposits
@@ -63,9 +67,7 @@ contract StakePool {
   /** @dev deposit funds to the contract
     */
   function deposit() public payable {
-    uint newBalance = SafeMath.add(depositedBalances[msg.sender], msg.value);
-    depositedBalances[msg.sender] = newBalance;
-
+    depositedBalances[msg.sender] = depositedBalances[msg.sender].add(msg.value);
     emit NotifyDeposit(msg.sender, msg.value, depositedBalances[msg.sender]);
   }
 
@@ -80,18 +82,15 @@ contract StakePool {
   /** @dev stake funds to stakeContract
     * http://solidity.readthedocs.io/en/latest/control-structures.html#external-function-calls
     */
-   StakeContract sc;
   function stake() public payable {
-    stakedBalances[msg.sender] =
-      SafeMath.add(stakedBalances[msg.sender], msg.value);
+    stakedBalances[msg.sender] = stakedBalances[msg.sender].add(msg.value);
 
     // track total staked
-    totalStaked = SafeMath.add(totalStaked, msg.value);
+    totalStaked = totalStaked.add(msg.value);
 
     // record block number for calculating profit distribution
     blockStaked[msg.sender] = block.number;
 
-    sc = StakeContract(stakeContract);
     // this is how to send ether with a call to an external contract
     sc.deposit.value(msg.value)();
 
@@ -105,27 +104,20 @@ contract StakePool {
   /** @dev unstake funds from stakeContract
     *
     */
-  function unstake(uint amount) public {
-    require(stakedBalances[msg.sender] >= amount);
+  function unstake() public {
+    // require(stakedBalances[msg.sender] >= amount);
     // track total staked
-    totalStaked = SafeMath.sub(totalStaked, amount);
-    // move value from depositedBalances to stakedBalances
-    depositedBalances[msg.sender] =
-      SafeMath.add(depositedBalances[msg.sender], amount);
-    stakedBalances[msg.sender] =
-      SafeMath.sub(stakedBalances[msg.sender], amount);
+    uint amount = stakedBalances[msg.sender];
+    stakedBalances[msg.sender] = stakedBalances[msg.sender].sub(amount);
+    totalStaked = totalStaked.sub(amount);
     // record block number for calculating profit distribution
     blockUnstaked[msg.sender] = block.number;
 
-    // TODO: compile error ?
-    // /mnt/projects/ethereum/learn/consensys_academy/final_project/contracts/StakePool.sol:140:5: TypeError: Member "withdraw" not found or not visible after argument-dependent lookup in address
-    // stakeContract.withdraw(amount);
-    // ^--------------------^
-   // stakeContract.withdraw(amount);
+    sc.withdraw(amount, msg.sender);
 
     emit NotifyStaked(
       msg.sender,
-      -amount,
+      amount,
       block.number
     );
   }
@@ -148,8 +140,7 @@ contract StakePool {
     require(depositedBalances[msg.sender] >= wdValue);
     uint startBalance = depositedBalances[msg.sender];
     // open zeppelin sub function to ensure no overflow
-    uint newBalance = SafeMath.sub(depositedBalances[msg.sender], wdValue);
-    depositedBalances[msg.sender] = newBalance;
+    depositedBalances[msg.sender] = depositedBalances[msg.sender].sub(wdValue);
     msg.sender.transfer(wdValue);
 
     emit NotifyWithdrawal(
