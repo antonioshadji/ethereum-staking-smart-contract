@@ -8,6 +8,7 @@ contract TestSafeMath {
   using SafeMath for uint;
 
   function testChainedAdd() public {
+    // test if using SafeMath for uint modifies original values or only returns
     uint var1 = 2;
     uint var2 = 3;
     uint expected = 5;
@@ -23,5 +24,17 @@ contract TestSafeMath {
     uint var4 = 5;
     Assert.equal(var1.mul(var2).mul(var3).div(var4), 8, 'left to right');
   }
+
+  function testOrderSub() public {
+    uint var1 = 100;
+    uint var2 = 20;
+    Assert.equal(SafeMath.sub(var1, var2), 80, 'first - second');
+  }
+
+  // function testOrderSubNeg() public {
+  //   uint var1 = 10;
+  //   uint var2 = 20;
+  //   Assert.equal(SafeMath.sub(var1, var2), -10, 'first - second');
+  // }
 }
 
