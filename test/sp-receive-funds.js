@@ -1,4 +1,4 @@
-/* global web3, before, artifacts, contract, it */
+/* global after, web3, before, artifacts, contract, it */
 // Mocha has an implied describe() block, called the “root suite”).
 
 const fs = require('fs')
@@ -85,5 +85,9 @@ contract(`StakePool receive funds: ${path.basename(__filename)}`, function (acco
       assert.exists(trxObj)
       log.write(JSON.stringify(trxObj, null, 2) + '\n')
     })
+  })
+
+  after('finished', function () {
+    log.end()
   })
 })

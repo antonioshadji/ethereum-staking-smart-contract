@@ -186,6 +186,8 @@ contract StakePool {
   /** @dev withdraw profits to owner account
     */
   function getOwnersProfits() public onlyOwner {
+    // TODO: test again after ownersProfit > 0
+    // require(ownersProfit > 0);
     uint valueWithdrawn = ownersProfit;
     owner.transfer(ownersProfit);
     emit NotifyProfitWithdrawal(valueWithdrawn);
