@@ -43,8 +43,8 @@ contract StakeContract {
      */
     function withdraw(uint wdValue, address payee) public {
       require(depositedBalances[msg.sender] >= wdValue);
-      // open zeppelin sub function to ensure no overflow
       uint startBalance = depositedBalances[msg.sender];
+      // open zeppelin sub function to ensure no overflow
       depositedBalances[msg.sender] = depositedBalances[msg.sender].sub(wdValue);
 
       // msg.sender.transfer(wdValue);
@@ -58,7 +58,7 @@ contract StakeContract {
       );
     }
 
-    /** @dev retreive balance from contract
+    /** @dev retrieve balance from contract
       * @return uint current value of deposit
       */
     function getBalance() public view returns (uint) {

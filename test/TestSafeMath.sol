@@ -34,7 +34,7 @@ contract TestSafeMath {
   function testOrderSubChain() public {
     uint var1 = 10;
     uint var2 = 20;
-    Assert.equal(var1.sub(var2), -10, 'first - second');
+    Assert.equal(var2.sub(var1), 10, 'first - second');
   }
 }
 
