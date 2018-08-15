@@ -183,9 +183,19 @@ contract StakePool {
     * receive funds and keep track of totals
     * it is assumed that only funds received will be from stakeContract
     */
+  // function () external payable {
+  //   // using smallest possible code to make it under 2300 wei gas limit
+  //   undistributedFunds += msg.value;
+  // }
+
+  event FallBackSP(
+    address sender,
+    uint value
+  );
+
   function () external payable {
-    // using smallest possible code to make it under 2300 wei gas limit
-    undistributedFunds += msg.value;
+    // depositedBalances[msg.sender] += msg.value;
+    emit FallBackSP(msg.sender, msg.value);
   }
 }
 

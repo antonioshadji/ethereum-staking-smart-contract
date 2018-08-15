@@ -65,8 +65,14 @@ contract StakeContract {
       return depositedBalances[msg.sender];
     }
 
+    event FallBackSC(
+      address sender,
+      uint value
+    );
+
   function () external payable {
-    depositedBalances[msg.sender] += msg.value;
+    // depositedBalances[msg.sender] += msg.value;
+    emit FallBackSC(msg.sender, msg.value);
   }
 }
 
