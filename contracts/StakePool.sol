@@ -6,18 +6,27 @@ import './StakeContract.sol';
 /* @title Staking Pool Contract */
 contract StakePool {
   using SafeMath for uint;
+
   /** @dev set owner
     */
   address private owner;
+  /** @dev owners profits
+    */
+  uint ownersProfit;
+
   /** @dev address of staking contract
     */
   address public stakeContract;
+  /** @dev staking contract object to interact with existing contract at known
+    * location
+    */
   StakeContract sc;
 
   /** @dev track total staked amount
     */
   uint totalStaked;
-  /** @dev creates contract
+
+  /** @dev contract constructor
     */
   constructor(address _stakeContract) public {
     owner = msg.sender;
@@ -118,7 +127,7 @@ contract StakePool {
 
     emit NotifyStaked(
       msg.sender,
-      amount,
+      -amount,
       block.number
     );
   }
@@ -159,15 +168,23 @@ contract StakePool {
     return depositedBalances[msg.sender];
   }
 
-  event NotifyProfitDrain(uint previousBal, uint finalBal);
+  /** @dev retreive staked balance from contract
+    * @return uint current value of stake deposit
+    */
+  function getStakedBalance() public view returns (uint) {
+    return stakedBalances[msg.sender];
+  }
+
+  /** @dev notify of owner profit withdraw
+    */
+  event NotifyProfitWithdrawal(uint valueWithdrawn);
+
   /** @dev withdraw profits to owner account
     */
-  function getProfits() public onlyOwner {
-    // TODO: this is incorrect just testing
-    uint previous = address(this).balance;
-    owner.transfer(address(this).balance);
-    uint finalBal = address(this).balance;
-    emit NotifyProfitDrain(previous, finalBal);
+  function getOwnersProfits() public onlyOwner {
+    uint valueWithdrawn = ownersProfit;
+    owner.transfer(ownersProfit);
+    emit NotifyProfitWithdrawal(valueWithdrawn);
   }
 
   /** @dev hold incoming funds from stake contract
@@ -180,27 +197,20 @@ contract StakePool {
     return undistributedFunds;
   }
 
-  /** @dev payable fallback
-    * receive funds and keep track of totals
-    * it is assumed that only funds received will be from stakeContract
+  /** @dev notify when funds received at contract
     */
-  // function () external payable {
-  //   // using smallest possible code to make it under 2300 wei gas limit
-  //   undistributedFunds += msg.value;
-  // }
-
   event FallBackSP(
     address sender,
     uint value
   );
 
+  /** @dev payable fallback
+    * it is assumed that only funds received will be from stakeContract
+    */
   function () external payable {
-    // depositedBalances[msg.sender] += msg.value;
     emit FallBackSP(msg.sender, msg.value);
   }
 }
-
-    // external function can not be called within this contract
 
   /* example comments for functions */
     /** @dev Calculates a rectangle's surface and perimeter.
