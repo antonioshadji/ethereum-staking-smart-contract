@@ -26,6 +26,10 @@ contract StakePool {
     */
   uint totalStaked;
 
+  /** @dev track total deposited
+    */
+  uint totalDeposited;
+
   /** @dev contract constructor
     */
   constructor(address _stakeContract) public {
@@ -187,14 +191,10 @@ contract StakePool {
     emit NotifyProfitWithdrawal(valueWithdrawn);
   }
 
-  /** @dev hold incoming funds from stake contract
-    */
-  uint private undistributedFunds;
-
   /** @dev owner only may retreive undistributedFunds value
     */
   function getUndistributedFundsValue() public view onlyOwner returns (uint) {
-    return undistributedFunds;
+    return address(this).balance.sub(ownersProfit).sub(totalDeposited);
   }
 
   /** @dev notify when funds received at contract
