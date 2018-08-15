@@ -61,11 +61,14 @@ contract(`stake / unstake functions: ${p.basename(__filename)}`, function (accou
         }
       )
     }).then(function (trxObj) {
+      assert.exists(trxObj)
       log.write(JSON.stringify(trxObj, null, 2))
       log.write('\n')
-      assert.equal(trxObj.logs.length, 2, 'there were not only 2 events fired')
-      assert.equal(trxObj.logs[0].event, 'NotifyDeposit')
-      assert.equal(trxObj.logs[1].event, 'NotifyStaked')
+
+      assert.exists(trxObj.logs)
+      trxObj.logs.forEach(function (e) {
+        assert.oneOf(e.event, ['NotifyDepositSC', 'NotifyStaked'])
+      })
     })
   })
 
