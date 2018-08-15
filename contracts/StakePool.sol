@@ -130,20 +130,24 @@ contract StakePool {
     * http://solidity.readthedocs.io/en/latest/control-structures.html#external-function-calls
     */
   function stake() public payable {
-    stakedBalances[msg.sender] = stakedBalances[msg.sender].add(msg.value);
+    // track deposited balance (in Pool contract)
+    uint toStake = depositedBalances[msg.sender];
+    depositedBalances[msg.sender] = 0;
+    // track staked balance
+    stakedBalances[msg.sender] = stakedBalances[msg.sender].add(toStake);
 
     // track total staked
-    totalStaked = totalStaked.add(msg.value);
+    totalStaked = totalStaked.add(toStake);
 
     // record block number for calculating profit distribution
     blockStaked[msg.sender] = block.number;
 
     // this is how to send ether with a call to an external contract
-    sc.deposit.value(msg.value)();
+    sc.deposit.value(toStake)();
 
     emit NotifyStaked(
       msg.sender,
-      msg.value,
+      toStake,
       block.number
     );
   }
@@ -156,6 +160,7 @@ contract StakePool {
     // track total staked
     uint amount = stakedBalances[msg.sender];
     stakedBalances[msg.sender] = stakedBalances[msg.sender].sub(amount);
+    depositedBalances[msg.sender] = depositedBalances[msg.sender].add(amount);
     totalStaked = totalStaked.sub(amount);
     // record block number for calculating profit distribution
     blockUnstaked[msg.sender] = block.number;
