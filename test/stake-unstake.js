@@ -11,7 +11,7 @@ contract(`stake / unstake functions: ${p.basename(__filename)}`, function (accou
   let stak = null
   let log = null
   before('show contract addresses', function () {
-    log = fs.createWriteStream(`./test/logs/testrun.log`)
+    log = fs.createWriteStream(`./test/logs/${p.basename(__filename)}.log`)
     log.write(`${(new Date()).toISOString()}\n`)
     StakeContract.deployed().then(function (instance) {
       stak = instance
