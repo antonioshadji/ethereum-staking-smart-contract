@@ -7,7 +7,7 @@ const assert = require('chai').assert
 const StakePool = artifacts.require('StakePool')
 const StakeContract = artifacts.require('StakeContract')
 
-contract(`StakePool StakeContract functions: ${path.basename(__filename)}`, function (accounts) {
+contract(`StakePool receive funds: ${path.basename(__filename)}`, function (accounts) {
   let pool = null
   let stak = null
   let log = null
@@ -36,27 +36,18 @@ contract(`StakePool StakeContract functions: ${path.basename(__filename)}`, func
     assert.typeOf(stak, 'Object')
   })
 
-  it(`should be able to receive funds from any user address`, function () {
-    // there is only a 2300 limit on transactions sent via transfer / send
-    // web3 can send standard gas with ether
-    return web3.eth.sendTransaction(
+  it(`should create logs when recieving ether without function call`, function () {
+    return pool.sendTransaction(
       {
         from: accounts[9],
-        to: pool.address,
         value: web3.toWei(1, 'ether')
-      },
-      function (err, transactionHash) {
-        assert.notExists(err)
-        assert.exists(transactionHash)
-        assert.equal(transactionHash.length, 66, 'result is transaction hash')
-        let trxObj = web3.eth.getTransaction(transactionHash)
-        assert.exists(trxObj)
-        log.write(JSON.stringify(trxObj, null, 2) + '\n')
-        let receipt = web3.eth.getTransactionReceipt(transactionHash)
-        assert.exists(receipt)
-        log.write(JSON.stringify(receipt, null, 2) + '\n')
       }
-    )
+    ).then(function (trxObj) {
+      assert.exists(trxObj)
+      log.write(JSON.stringify(trxObj, null, 2) + '\n')
+      assert.exists(trxObj.logs)
+      assert.isAtLeast(trxObj.logs.length, 1)
+    })
   })
 
   it(`should have a balance of 1 ether in StakePool`, function () {
@@ -65,5 +56,34 @@ contract(`StakePool StakeContract functions: ${path.basename(__filename)}`, func
       web3.toWei(1, 'ether'),
       'StakePool account balance is not as expected'
     )
+  })
+
+  it(`StakeContract should generate logs when receiving ether via fallback function`, function () {
+    return stak.sendTransaction(
+      {
+        from: accounts[9],
+        value: web3.toWei(2, 'ether')
+      }
+    ).then(function (trxObj) {
+      assert.exists(trxObj)
+      log.write(JSON.stringify(trxObj, null, 2) + '\n')
+      assert.exists(trxObj.logs)
+      assert.isAtLeast(trxObj.logs.length, 1)
+    })
+  })
+
+  it(`should have a balance of 2 ether in StakeContract`, function () {
+    assert.equal(
+      web3.eth.getBalance(stak.address).valueOf(),
+      web3.toWei(2, 'ether'),
+      'StakeContract account balance is not as expected'
+    )
+  })
+
+  it(`should be able to receive funds from StakeContract`, function () {
+    return pool.unstake().then(function (trxObj) {
+      assert.exists(trxObj)
+      log.write(JSON.stringify(trxObj, null, 2) + '\n')
+    })
   })
 })

@@ -41,14 +41,14 @@ contract StakeContract {
      * @param wdValue amount to withdraw
      * not payable, not receiving funds
      */
-    function withdraw(uint wdValue, address payee) public {
+    function withdraw(uint wdValue) public {
       require(depositedBalances[msg.sender] >= wdValue);
       uint startBalance = depositedBalances[msg.sender];
       // open zeppelin sub function to ensure no overflow
       depositedBalances[msg.sender] = depositedBalances[msg.sender].sub(wdValue);
 
-      // msg.sender.transfer(wdValue);
-      payee.transfer(wdValue);
+      // transfer & send will hit payee fallback function if a contract
+      msg.sender.transfer(wdValue);
 
       emit NotifyWithdrawal(
         msg.sender,

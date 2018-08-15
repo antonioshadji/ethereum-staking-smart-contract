@@ -1,4 +1,5 @@
-/* global describe, it , web3, contract, after */
+/* global before, beforeEach, describe, it , web3, contract, after */
+'use strict'
 const assert = require('chai').assert
 let rootVar = 1000
 
@@ -48,6 +49,7 @@ describe('this is the outer describe', function () {
     it('should include key a', function () {
       assert.property({ a: 1 }, 'a')
     })
+
     // this updates variable before any test is run inside THIS describe
     // rootVar = 2000
     // it('should see variables set in the root suite, and updated inside', function () {
@@ -56,7 +58,67 @@ describe('this is the outer describe', function () {
   })
 })
 
+describe('mocha before hooks', function () {
+  before(() => console.log('*** top-level before()'))
+  beforeEach(() => console.log('*** top-level beforeEach()'))
+  describe('nesting', function () {
+    before(() => console.log('*** nested before()'))
+    beforeEach(() => console.log('*** nested beforeEach()'))
+    it('is a nested spec', () => {
+      assert.isOk(true)
+    })
+  })
+})
 
+// this test is in the root suite
+it.skip(`should have funds in StakeContract for next tests`, function () {
+  // there is only a 2300 limit on transactions sent via transfer / send
+  // web3 can send standard gas with ether
+  return web3.eth.sendTransaction(
+    {
+      from: accounts[9],
+      to: stak.address,
+      value: web3.toWei(2, 'ether')
+    },
+    function (err, transactionHash) {
+      assert.notExists(err)
+      assert.exists(transactionHash)
+      assert.equal(transactionHash.length, 66, 'result is transaction hash')
+      let trxObj = web3.eth.getTransaction(transactionHash)
+      assert.exists(trxObj)
+      log.write(JSON.stringify(trxObj, null, 2) + '\n')
+      let receipt = web3.eth.getTransactionReceipt(transactionHash)
+      assert.exists(receipt)
+      log.write(JSON.stringify(receipt, null, 2) + '\n')
+      assert.exists(receipt.logs, 'logs array does not exist')
+      assert.isOk(receipt.logs.length, 'logs array is empty')
+    }
+  )
+})
+it.skip(`should be able to receive funds from any user address`, function () {
+  // there is only a 2300 limit on transactions sent via transfer / send
+  // web3 can send standard gas with ether
+  return web3.eth.sendTransaction(
+    {
+      from: accounts[9],
+      to: pool.address,
+      value: web3.toWei(1, 'ether')
+    },
+    function (err, transactionHash) {
+      assert.notExists(err)
+      assert.exists(transactionHash)
+      assert.equal(transactionHash.length, 66, 'result is transaction hash')
+      let trxObj = web3.eth.getTransaction(transactionHash)
+      assert.exists(trxObj)
+      log.write(JSON.stringify(trxObj, null, 2) + '\n')
+      let receipt = web3.eth.getTransactionReceipt(transactionHash)
+      assert.exists(receipt)
+      log.write(JSON.stringify(receipt, null, 2) + '\n')
+      assert.exists(receipt.logs, 'logs array does not exist')
+      assert.isOk(receipt.logs.length, 'logs array is empty')
+    }
+  )
+})
 
 // this is sample code
 // function testSendEther(value, target, account) {

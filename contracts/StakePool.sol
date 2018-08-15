@@ -113,7 +113,8 @@ contract StakePool {
     // record block number for calculating profit distribution
     blockUnstaked[msg.sender] = block.number;
 
-    sc.withdraw(amount, msg.sender);
+    // sc.withdraw(amount, msg.sender);
+    sc.withdraw(amount);
 
     emit NotifyStaked(
       msg.sender,
