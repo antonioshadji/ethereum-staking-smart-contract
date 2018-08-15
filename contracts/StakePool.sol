@@ -30,14 +30,6 @@ contract StakePool {
     */
   uint totalDeposited;
 
-  /** @dev contract constructor
-    */
-  constructor(address _stakeContract) public {
-    owner = msg.sender;
-    stakeContract = _stakeContract;
-    sc = StakeContract(stakeContract);
-  }
-
   /** @dev track balances of ether deposited to contract
     */
   mapping(address => uint) private depositedBalances;
@@ -52,6 +44,28 @@ contract StakePool {
   /** @dev track block.number when ether was unstaked
     */
   mapping(address => uint) private blockUnstaked;
+
+  /** @dev contract constructor
+    */
+  constructor(address _stakeContract) public {
+    owner = msg.sender;
+    stakeContract = _stakeContract;
+    sc = StakeContract(stakeContract);
+  }
+
+  /** @dev payable fallback
+    * it is assumed that only funds received will be from stakeContract
+    */
+  function () external payable {
+    emit FallBackSP(msg.sender, msg.value);
+  }
+
+  /** @dev notify when funds received at contract
+    */
+  event FallBackSP(
+    address sender,
+    uint value
+  );
 
   /** @dev restrict function to only work when called by owner
     */
@@ -68,6 +82,26 @@ contract StakePool {
   function setStakeContract(address _staker) public onlyOwner {
    stakeContract = _staker;
    sc = StakeContract(stakeContract);
+  }
+
+  /** @dev withdraw profits to owner account
+    */
+  function getOwnersProfits() public onlyOwner {
+    // TODO: test again after ownersProfit > 0
+    // require(ownersProfit > 0);
+    uint valueWithdrawn = ownersProfit;
+    owner.transfer(ownersProfit);
+    emit NotifyProfitWithdrawal(valueWithdrawn);
+  }
+
+  /** @dev notify of owner profit withdraw
+    */
+  event NotifyProfitWithdrawal(uint valueWithdrawn);
+
+  /** @dev owner only may retreive undistributedFunds value
+    */
+  function getUndistributedFundsValue() public view onlyOwner returns (uint) {
+    return address(this).balance.sub(ownersProfit).sub(totalDeposited);
   }
 
   /** @dev trigger notification of deposits
@@ -177,40 +211,6 @@ contract StakePool {
     */
   function getStakedBalance() public view returns (uint) {
     return stakedBalances[msg.sender];
-  }
-
-  /** @dev notify of owner profit withdraw
-    */
-  event NotifyProfitWithdrawal(uint valueWithdrawn);
-
-  /** @dev withdraw profits to owner account
-    */
-  function getOwnersProfits() public onlyOwner {
-    // TODO: test again after ownersProfit > 0
-    // require(ownersProfit > 0);
-    uint valueWithdrawn = ownersProfit;
-    owner.transfer(ownersProfit);
-    emit NotifyProfitWithdrawal(valueWithdrawn);
-  }
-
-  /** @dev owner only may retreive undistributedFunds value
-    */
-  function getUndistributedFundsValue() public view onlyOwner returns (uint) {
-    return address(this).balance.sub(ownersProfit).sub(totalDeposited);
-  }
-
-  /** @dev notify when funds received at contract
-    */
-  event FallBackSP(
-    address sender,
-    uint value
-  );
-
-  /** @dev payable fallback
-    * it is assumed that only funds received will be from stakeContract
-    */
-  function () external payable {
-    emit FallBackSP(msg.sender, msg.value);
   }
 }
 
