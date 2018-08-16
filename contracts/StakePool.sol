@@ -48,6 +48,9 @@ contract StakePool {
   /** @dev track users
     */
   address[] users;
+  /** @dev track index by address added to users
+    */
+  mapping(address => uint) private userIndex;
 
   /** @dev contract constructor
     */
@@ -79,6 +82,23 @@ contract StakePool {
       "only owner can call this function"
     );
     _;
+  }
+
+  /** @dev remove a user from users array
+    */
+  function removeUser(address _user) internal {
+    uint index = userIndex[_user];
+    address lastUser = users[users.length.sub(1)];
+    users[index] = lastUser;
+    userIndex[lastUser] = index;
+    users.length = users.length.sub(1);
+  }
+
+  /** @dev add a user to users array
+    */
+  function addUser(address _user) internal {
+    users.push(_user);
+    userIndex[_user] = users.length.sub(1);
   }
 
   /** @dev set staking contract address
@@ -220,6 +240,41 @@ contract StakePool {
     */
   function getStakedBalance() public view returns (uint) {
     return stakedBalances[msg.sender];
+  }
+  /** @dev retreive stake request balance from contract
+    * @return uint current value of stake request
+    */
+  function getStakeRequestBalance() public view returns (uint) {
+    return requestStake[msg.sender];
+  }
+  /** @dev retreive stake request balance from contract
+    * @return uint current value of stake request
+    */
+  function getUnStakeRequestBalance() public view returns (uint) {
+    return requestUnStake[msg.sender];
+  }
+
+  /** @dev track user request to enter next staking period
+    */
+  mapping(address => uint) private requestStake;
+  /** @dev track user request to exit current staking period
+    */
+  mapping(address => uint) private requestUnStake;
+
+  /** @dev user can request to enter next staking period
+    */
+  function requestNextStakingPeriod() public returns (bool) {
+    require(depositedBalances[msg.sender] > 0);
+    uint amount = depositedBalances[msg.sender];
+    depositedBalances[msg.sender] = 0;
+    requestStake[msg.sender] = amount;
+  }
+
+  /** @dev user can request to exit at end of current staking period
+    */
+  function requestExitAtEndOfCurrentStakingPeriod(uint amount) public returns (bool) {
+    require(stakedBalances[msg.sender] > amount);
+    requestUnStake[msg.sender] = amount;
   }
 }
 

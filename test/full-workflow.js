@@ -8,14 +8,16 @@ const p = require('path')
 const assert = require('chai').assert
 const StakePool = artifacts.require('StakePool')
 const StakeContract = artifacts.require('StakeContract')
+const fn = p.basename(__filename)
 
-contract(`User StakePool interactionions : ${p.basename(__filename)}`, function (accounts) {
+contract(`User StakePool interactionions : ${fn}`, function (accounts) {
   let pool = null
   let stak = null
   let log = null
   before('show contract addresses', function () {
-    log = fs.createWriteStream(`./test/logs/${p.basename(__filename)}.log`)
+    log = fs.createWriteStream(`./test/logs/${fn}.log`)
     log.write(`${(new Date()).toISOString()}\n`)
+    log.write(`web3 version: ${web3.version.api}\n`)
     StakeContract.deployed().then(function (instance) {
       stak = instance
       log.write(`StakeContract: ${stak.address}\n`)
@@ -84,16 +86,8 @@ contract(`User StakePool interactionions : ${p.basename(__filename)}`, function 
     })
   })
 
-  it('should NOT be able to return ether to wrong account (fails as expected)', async function () {
-    try {
-      await StakePool.deployed().then(function (instance) {
-        return instance.withdraw(web3.toWei(1, 'ether'), {from: accounts[9]})
-      })
-    } catch (err) {
-      assert.exists(err)
-      return
-    }
-    assert.fail('no error detected')
+  it.skip('should allow user to request that deposited ether is staked in next round', function () {
+
   })
 
   tests.forEach(function (test, index) {
@@ -144,6 +138,8 @@ contract(`User StakePool interactionions : ${p.basename(__filename)}`, function 
     })
   })
 
+  it('should allow users to request unstake')
+
   tests.forEach(function (test, index) {
     it(`should be able to unstake deposited balance for account:${index + 1}`, function () {
       return StakePool.deployed().then(function (instance) {
@@ -179,6 +175,18 @@ contract(`User StakePool interactionions : ${p.basename(__filename)}`, function 
     }).then(function (balance) {
       assert.equal(balance, web3.toWei(2, 'ether'), 'account balance check failed')
     })
+  })
+
+  it('should NOT be able to return ether to wrong account (fails as expected)', async function () {
+    try {
+      await StakePool.deployed().then(function (instance) {
+        return instance.withdraw(web3.toWei(1, 'ether'), {from: accounts[9]})
+      })
+    } catch (err) {
+      assert.exists(err)
+      return
+    }
+    assert.fail('no error detected')
   })
 
   tests.forEach(function (test, index) {
