@@ -65,15 +65,19 @@ contract(`User StakePool interactionions : ${fn}`, function (accounts) {
         assert.equal(amount, web3.toWei(1, 'ether'), 'amount not received')
       })
     })
-  })
 
-  tests.forEach(function (test, index) {
     it(`should now have balance of 1 ether for account:${index + 1}`, function () {
       return StakePool.deployed().then(function (instance) {
         return instance.getBalance({from: test})
       }).then(function (balance) {
         assert.equal(balance.valueOf(), web3.toWei(1, 'ether'),
           'account balance is not 1 ether')
+      })
+    })
+
+    it(`should show account:${index + 1} as a user`, function () {
+      return pool.isExistingUser(test).then(function (bool) {
+        assert.isOk(bool)
       })
     })
   })
@@ -86,12 +90,31 @@ contract(`User StakePool interactionions : ${fn}`, function (accounts) {
     })
   })
 
-  it.skip('should allow user to request that deposited ether is staked in next round', function () {
+  tests.forEach(function (test, index) {
+    it(`should allow account:${index + 1} to request that deposited ether is staked in next round`, function () {
+      return StakePool.deployed().then(function (instance) {
+        return instance.requestNextStakingPeriod({ from: test })
+      }).then(function (trxObj) {
+        assert.exists(trxObj)
+        log.write(JSON.stringify(trxObj, null, 2))
+        log.write('\n')
+      })
+    })
 
+    it(`should show a requested stake balance for account:${index + 1}`, function () {
+      return pool.getStakeRequestBalance({from: test}).then(function (value) {
+        assert.equal(value, web3.toWei(1, 'ether'), 'request not recorded')
+      })
+    })
+    it(`should show a deposit balance of zero account:${index + 1}`, function () {
+      return pool.getBalance({from: test}).then(function (value) {
+        assert.equal(value, web3.toWei(0, 'ether'), 'deposit not adjusted')
+      })
+    })
   })
 
   tests.forEach(function (test, index) {
-    it(`should be able to stake deposited balance for account:${index + 1}`, function () {
+    it.skip(`should be able to stake deposited balance for account:${index + 1}`, function () {
       return StakePool.deployed().then(function (instance) {
         return instance.stake(
           {
@@ -113,7 +136,7 @@ contract(`User StakePool interactionions : ${fn}`, function (accounts) {
   })
 
   tests.forEach(function (test, index) {
-    it(`should now have staked balance of 1 ether for account:${index + 1}`, function () {
+    it.skip(`should now have staked balance of 1 ether for account:${index + 1}`, function () {
       return StakePool.deployed().then(function (instance) {
         return instance.getStakedBalance({from: test})
       }).then(function (balance) {
@@ -122,7 +145,7 @@ contract(`User StakePool interactionions : ${fn}`, function (accounts) {
     })
   })
 
-  it(`should have a balance of 2 ether in StakeContract`, function () {
+  it.skip(`should have a balance of 2 ether in StakeContract`, function () {
     return StakeContract.deployed().then(function (instance) {
       return web3.eth.getBalance(instance.address).toNumber()
     }).then(function (balance) {
@@ -130,7 +153,7 @@ contract(`User StakePool interactionions : ${fn}`, function (accounts) {
     })
   })
 
-  it('should have zero balance in StakePool', function () {
+  it.skip('should have zero balance in StakePool', function () {
     return StakePool.deployed().then(function (instance) {
       return web3.eth.getBalance(instance.address).toNumber()
     }).then(function (balance) {
@@ -141,7 +164,7 @@ contract(`User StakePool interactionions : ${fn}`, function (accounts) {
   it('should allow users to request unstake')
 
   tests.forEach(function (test, index) {
-    it(`should be able to unstake deposited balance for account:${index + 1}`, function () {
+    it.skip(`should be able to unstake deposited balance for account:${index + 1}`, function () {
       return StakePool.deployed().then(function (instance) {
         return instance.unstake(
           {
@@ -161,7 +184,7 @@ contract(`User StakePool interactionions : ${fn}`, function (accounts) {
     })
   })
 
-  it('should now have zero balance in StakeContract', function () {
+  it.skip('should now have zero balance in StakeContract', function () {
     return StakeContract.deployed().then(function (instance) {
       return web3.eth.getBalance(instance.address).toNumber()
     }).then(function (balance) {
@@ -169,7 +192,7 @@ contract(`User StakePool interactionions : ${fn}`, function (accounts) {
     })
   })
 
-  it('should now have balance of 2 ether in StakePool', function () {
+  it.skip('should now have balance of 2 ether in StakePool', function () {
     return StakePool.deployed().then(function (instance) {
       return web3.eth.getBalance(instance.address).toNumber()
     }).then(function (balance) {
@@ -177,7 +200,7 @@ contract(`User StakePool interactionions : ${fn}`, function (accounts) {
     })
   })
 
-  it('should NOT be able to return ether to wrong account (fails as expected)', async function () {
+  it.skip('should NOT be able to return ether to wrong account (fails as expected)', async function () {
     try {
       await StakePool.deployed().then(function (instance) {
         return instance.withdraw(web3.toWei(1, 'ether'), {from: accounts[9]})
@@ -190,7 +213,7 @@ contract(`User StakePool interactionions : ${fn}`, function (accounts) {
   })
 
   tests.forEach(function (test, index) {
-    it(`should be able to return ether to correct account: ${index + 1}`, function () {
+    it.skip(`should be able to return ether to correct account: ${index + 1}`, function () {
       return StakePool.deployed().then(function (instance) {
         return instance.withdraw(
           web3.toWei(1, 'ether'),
@@ -206,7 +229,7 @@ contract(`User StakePool interactionions : ${fn}`, function (accounts) {
     })
   })
 
-  it('should finish with zero balance in StakePool', function () {
+  it.skip('should finish with zero balance in StakePool', function () {
     return StakePool.deployed().then(function (instance) {
       return web3.eth.getBalance(instance.address).toNumber()
     }).then(function (balance) {

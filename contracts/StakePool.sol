@@ -58,6 +58,8 @@ contract StakePool {
     owner = msg.sender;
     stakeContract = _stakeContract;
     sc = StakeContract(stakeContract);
+    // set owner to users[0] because unknown user will return 0 from userIndex
+    users.push(owner);
   }
 
   /** @dev payable fallback
@@ -75,6 +77,7 @@ contract StakePool {
   );
 
   /** @dev restrict function to only work when called by owner
+    * TODO: replace with zeppelin Ownable?
     */
   modifier onlyOwner() {
     require(
@@ -84,19 +87,33 @@ contract StakePool {
     _;
   }
 
+  /************************ USER MANAGEMENT **********************************/
+  /* TODO: create Library?? */
+  /** @dev test if user is in current user list
+    */
+  function isExistingUser(address _user) public view returns (bool) {
+    if ( userIndex[_user] == 0) {
+      return false;
+    }
+    return true;
+  }
+
   /** @dev remove a user from users array
     */
   function removeUser(address _user) internal {
     uint index = userIndex[_user];
-    address lastUser = users[users.length.sub(1)];
-    users[index] = lastUser;
-    userIndex[lastUser] = index;
+    if (index < users.length.sub(1)) {
+      address lastUser = users[users.length.sub(1)];
+      users[index] = lastUser;
+      userIndex[lastUser] = index;
+    }
     users.length = users.length.sub(1);
   }
 
   /** @dev add a user to users array
     */
   function addUser(address _user) internal {
+    if (isExistingUser(_user)) return;
     users.push(_user);
     userIndex[_user] = users.length.sub(1);
   }
@@ -138,6 +155,7 @@ contract StakePool {
   /** @dev deposit funds to the contract
     */
   function deposit() public payable {
+    addUser(msg.sender);
     depositedBalances[msg.sender] = depositedBalances[msg.sender].add(msg.value);
     emit NotifyDeposit(msg.sender, msg.value, depositedBalances[msg.sender]);
   }
@@ -263,7 +281,7 @@ contract StakePool {
 
   /** @dev user can request to enter next staking period
     */
-  function requestNextStakingPeriod() public returns (bool) {
+  function requestNextStakingPeriod() public {
     require(depositedBalances[msg.sender] > 0);
     uint amount = depositedBalances[msg.sender];
     depositedBalances[msg.sender] = 0;
@@ -272,7 +290,7 @@ contract StakePool {
 
   /** @dev user can request to exit at end of current staking period
     */
-  function requestExitAtEndOfCurrentStakingPeriod(uint amount) public returns (bool) {
+  function requestExitAtEndOfCurrentStakingPeriod(uint amount) public {
     require(stakedBalances[msg.sender] > amount);
     requestUnStake[msg.sender] = amount;
   }
