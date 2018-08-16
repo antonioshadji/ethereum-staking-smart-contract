@@ -43,5 +43,37 @@ contract TestSafeMath {
     uint var2 = 20;
     Assert.equal(var0.sub(var1).sub(var2), 69, 'not expected');
   }
+
+  function testFractions() public {
+    uint var0 = 1;
+    uint var1 = 2;
+    Assert.equal(var0.div(var1), 0, 'not expected');
+  }
+
+  // by default array in global scope is storage type
+  uint[] numbers;
+  function testArray() public {
+    // push only works for storage arrays
+    // (declared in global scope, or with modifier inside function )
+    numbers.push(1);
+    numbers.push(2);
+    numbers.push(3);
+    // memory arrays don't have push method
+    // numbers[0] = 1;
+    // numbers[1] = 2;
+    // numbers[2] = 3;
+
+    Assert.equal(numbers.length, 3, 'not expected');
+    Assert.equal(numbers[1], 2, 'not expected');
+    delete numbers[1];
+    Assert.equal(numbers[1], 0, 'not expected');
+    Assert.equal(numbers.length, 3, 'not expected');
+    numbers[1] = numbers[2];
+    numbers.length = 2;
+    Assert.equal(numbers[0], 1, 'not expected');
+    Assert.equal(numbers[1], 3, 'not expected');
+    // throws invalid opcode VM Exception
+    // Assert.equal(numbers[2], 3, 'not expected');
+  }
 }
 

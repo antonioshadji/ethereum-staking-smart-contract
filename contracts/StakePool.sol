@@ -161,7 +161,7 @@ contract StakePool {
     */
   function unstake() public {
     // require(stakedBalances[msg.sender] >= amount);
-    // track total staked
+    // track total staked -- always unstake full amount
     uint amount = stakedBalances[msg.sender];
     stakedBalances[msg.sender] = stakedBalances[msg.sender].sub(amount);
     depositedBalances[msg.sender] = depositedBalances[msg.sender].add(amount);
