@@ -12,7 +12,7 @@ contract StakePool {
   address private owner;
   /** @dev owners profits
     */
-  uint ownersProfit;
+  uint private ownersProfit;
 
   /** @dev address of staking contract
     */
@@ -44,6 +44,10 @@ contract StakePool {
   /** @dev track block.number when ether was unstaked
     */
   mapping(address => uint) private blockUnstaked;
+
+  /** @dev track users
+    */
+  address[] users;
 
   /** @dev contract constructor
     */
