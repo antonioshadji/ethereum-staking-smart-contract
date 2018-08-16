@@ -57,7 +57,8 @@ contract TestSafeMath {
     // (declared in global scope, or with modifier inside function )
     numbers.push(1);
     numbers.push(2);
-    numbers.push(3);
+    uint l = numbers.push(3);
+    Assert.equal(l, 3, 'expected push to return length');
     // memory arrays don't have push method
     // numbers[0] = 1;
     // numbers[1] = 2;
