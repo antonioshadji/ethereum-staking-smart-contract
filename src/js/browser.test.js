@@ -10,7 +10,7 @@ describe('Test browser code', function () {
 
   before(function () {
     // runs before all tests in this block
-    // App.init()
+    App.init()
   })
 
   describe('App.js', function () {
