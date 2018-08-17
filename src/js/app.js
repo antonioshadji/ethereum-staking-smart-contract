@@ -47,7 +47,6 @@ const App = {
     console.log('web3 version: ', web3.version.api)
     App.logNetwork()
     App.updateAccount()
-    App.initContract('StakeContract')
     App.initContract('StakePool')
   },
 
@@ -62,10 +61,11 @@ const App = {
       .then(function (data) {
         console.log(`getJSON.then:${name}`)
         console.log(`${name}:\n`, App.contracts[name])
-        if (name === 'StakePool') {
-          UI.enableElemById('#b_trx')
-          App.getBalance()
-        }
+        UI.enableElemById('#b_trx')
+        App.getBalance()
+        App.getStakedBalance()
+        App.getStakeRequestBalance()
+        App.getUnStakeRequestBalance()
       })
       .fail(function (jqxhr, textStatus, error) {
         let err = textStatus + ', ' + error
@@ -105,12 +105,9 @@ const App = {
   },
 
   getBalance: function () {
-    console.log('Default account: ', web3.eth.defaultAccount)
-    console.log('App.account: ', App.account)
-    console.log('Default block: ', web3.eth.defaultBlock)
-
     App.contracts.StakePool.deployed().then(function (instance) {
-      return instance.getBalance.call()
+      // TODO: this method below will allow consolidating all get balance functions
+      return instance['getBalance'].call()
     }).then(function (value) {
       console.log('Value: ', value)
       let v = web3.fromWei(value.toNumber(), 'ether')
@@ -122,6 +119,57 @@ const App = {
       console.error('Contract not found. Ensure contract is deployed')
       console.error(`Balance request failed: ${err.message}`)
       $('#s_value').text('0')
+    })
+  },
+
+  getStakedBalance: function () {
+    App.contracts.StakePool.deployed().then(function (instance) {
+      return instance.getStakedBalance.call()
+    }).then(function (value) {
+      console.log('Value: ', value)
+      let v = web3.fromWei(value.toNumber(), 'ether')
+      console.log('Update Balance: ', v)
+      // value is in wei, display in ether
+      // TODO: update UI with balance
+      $('#s_staked').text(v)
+    }).catch(function (err) {
+      console.error('Contract not found. Ensure contract is deployed')
+      console.error(`Balance request failed: ${err.message}`)
+      $('#s_staked').text('0')
+    })
+  },
+
+  getStakeRequestBalance: function () {
+    App.contracts.StakePool.deployed().then(function (instance) {
+      return instance.getStakeRequestBalance.call()
+    }).then(function (value) {
+      console.log('Value: ', value)
+      let v = web3.fromWei(value.toNumber(), 'ether')
+      console.log('Update Balance: ', v)
+      // value is in wei, display in ether
+      // TODO: update UI with balance
+      $('#s_req_stake').text(v)
+    }).catch(function (err) {
+      console.error('Contract not found. Ensure contract is deployed')
+      console.error(`Balance request failed: ${err.message}`)
+      $('#s_req_stake').text('0')
+    })
+  },
+
+  getUnStakeRequestBalance: function () {
+    App.contracts.StakePool.deployed().then(function (instance) {
+      return instance.getUnStakeRequestBalance.call()
+    }).then(function (value) {
+      console.log('Value: ', value)
+      let v = web3.fromWei(value.toNumber(), 'ether')
+      console.log('Update Balance: ', v)
+      // value is in wei, display in ether
+      // TODO: update UI with balance
+      $('#s_req_unstake').text(v)
+    }).catch(function (err) {
+      console.error('Contract not found. Ensure contract is deployed')
+      console.error(`Balance request failed: ${err.message}`)
+      $('#s_req_unstake').text('0')
     })
   },
 
@@ -164,6 +212,49 @@ const App = {
       }
     }).catch(function (err) {
       console.log('Error: ', err)
+    })
+  },
+
+  requestStake: function (value) {
+    App.contracts.StakePool.deployed().then(function (instance) {
+      return instance.requestNextStakingPeriod()
+    }).then(function (trxObj) {
+      console.log(trxObj)
+    }).catch(function (err) {
+      console.error(err)
+    })
+  },
+
+  requestUnStake: function (value) {
+    App.contracts.StakePool.deployed().then(function (instance) {
+      return instance.requestExitAtEndOfCurrentStakingPeriod(
+        web3.toWei(value, 'ether'),
+        {from: App.account}
+      )
+    }).then(function (trxObj) {
+      console.log(trxObj)
+    }).catch(function (err) {
+      console.error(err)
+    })
+  },
+
+  testOwnerStake: function () {
+    App.contracts.StakePool.deployed().then(function (instance) {
+      return instance.stake()
+    }).then(function (trxObj) {
+      console.log(trxObj)
+    }).catch(function (err) {
+      console.error(err)
+    })
+  },
+
+  testOwnerUnStake: function () {
+    App.contracts.StakePool.deployed().then(function (instance) {
+      return instance.unstake()
+    }).then(function (trxObj) {
+      console.log(trxObj)
+    }).catch(function (err) {
+      console.error(err)
     })
   },
 

@@ -25,8 +25,19 @@ const UI = {
     })
 
     $('#b_max').on('click', () => {
-      console.log('click')
+      console.log('click max withdraw')
       $('#i_withdrawal').val(new web3.BigNumber($('#s_value').text()).toNumber())
+    })
+
+    $('#b_max_stake').on('click', () => {
+      console.log('click max stake')
+      $('#i_stake').val(new web3.BigNumber($('#s_value').text()).toNumber())
+    })
+
+    $('#b_max_ustake').on('click', () => {
+      console.log('click max unstake')
+      console.log($('#s_staked').text())
+      $('#i_ustake').val($('#s_staked').text())
     })
 
     /* setup related event listeners */
@@ -41,6 +52,7 @@ const UI = {
       // default account is null
       // console.log(web3.eth.defaultAccount)
       App.sendTransaction($('#i_value').val())
+      $('#i_value').val('')
     })
 
     $('#b_withdrawal').on('click', () => {
@@ -49,6 +61,17 @@ const UI = {
       // default account is null
       // console.log(web3.eth.defaultAccount)
       App.makeWithdrawal($('#i_withdrawal').val())
+      $('#i_withdrawal').val('')
+    })
+
+    $('#b_stake').on('click', () => {
+      console.log('click b_stake')
+      App.requestStake()
+    })
+
+    $('#b_ustake').on('click', () => {
+      console.log('click b_ustake')
+      App.requestUnStake($('#i_ustake').val())
     })
 
     // browser test page only available on test server
