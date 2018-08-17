@@ -9,3 +9,7 @@ module.exports = function (deployer, network, accounts) {
     return deployer.deploy(StakePool, instance.address)
   })
 }
+
+// add this to deploy to send ether with constructor call
+// constructor must be payable
+// {from: accounts[0], value: 1e18}
