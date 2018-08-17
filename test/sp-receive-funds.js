@@ -6,15 +6,16 @@ const path = require('path')
 const assert = require('chai').assert
 const StakePool = artifacts.require('StakePool')
 const StakeContract = artifacts.require('StakeContract')
+const fn = path.basename(__filename)
 
-contract(`StakePool receive funds: ${path.basename(__filename)}`, function (accounts) {
+contract(`StakePool receive funds: ${fn}`, function (accounts) {
   let pool = null
   let stak = null
   let log = null
   before('setup contract instances', function () {
-    log = fs.createWriteStream(`./test/logs/testrun.log`)
+    log = fs.createWriteStream(`./test/logs/${fn}.log`)
     log.write(`${(new Date()).toISOString()}\n`)
-    log.write('accounts[9]: ' + accounts[9] + '\n')
+    log.write(`accounts[9]:${accounts[9]}\n`)
 
     StakePool.deployed().then(function (instance) {
       pool = instance
