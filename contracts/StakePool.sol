@@ -12,7 +12,7 @@ contract StakePool {
   address private owner;
   /** @dev owners profits
     */
-  uint private ownersProfit;
+  uint private ownersBalance;
 
   /** @dev address of staking contract
     */
@@ -135,10 +135,10 @@ contract StakePool {
   /** @dev withdraw profits to owner account
     */
   function getOwnersProfits() public onlyOwner {
-    // TODO: test again after ownersProfit > 0
-    // require(ownersProfit > 0);
-    uint valueWithdrawn = ownersProfit;
-    owner.transfer(ownersProfit);
+    // TODO: test again after ownersBalance > 0
+    // require(ownersBalance > 0);
+    uint valueWithdrawn = ownersBalance;
+    owner.transfer(ownersBalance);
     emit NotifyProfitWithdrawal(valueWithdrawn);
   }
 
@@ -149,7 +149,7 @@ contract StakePool {
   /** @dev owner only may retreive undistributedFunds value
     */
   function getUndistributedFundsValue() public view onlyOwner returns (uint) {
-    return address(this).balance.sub(ownersProfit).sub(totalDeposited);
+    return address(this).balance.sub(ownersBalance).sub(totalDeposited);
   }
 
   /** @dev trigger notification of deposits
