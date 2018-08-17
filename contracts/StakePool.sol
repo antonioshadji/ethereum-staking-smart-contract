@@ -292,6 +292,7 @@ contract StakePool {
     uint amount = depositedBalances[msg.sender];
     depositedBalances[msg.sender] = 0;
     requestStake[msg.sender] = amount;
+    emit NotifyStaked(msg.sender, amount, block.number);
   }
 
   /** @dev user can request to exit at end of current staking period
@@ -299,6 +300,7 @@ contract StakePool {
   function requestExitAtEndOfCurrentStakingPeriod(uint amount) public {
     require(stakedBalances[msg.sender] >= amount);
     requestUnStake[msg.sender] = amount;
+    emit NotifyStaked(msg.sender, amount, block.number);
   }
 }
 
