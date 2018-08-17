@@ -45,6 +45,13 @@ contract StakePool {
     */
   mapping(address => uint) private blockUnstaked;
 
+  /** @dev track user request to enter next staking period
+    */
+  mapping(address => uint) private requestStake;
+  /** @dev track user request to exit current staking period
+    */
+  mapping(address => uint) private requestUnStake;
+
   /** @dev track users
     */
   address[] users;
@@ -171,18 +178,20 @@ contract StakePool {
   /** @dev stake funds to stakeContract
     * http://solidity.readthedocs.io/en/latest/control-structures.html#external-function-calls
     */
-  function stake() public payable {
-    // track deposited balance (in Pool contract)
-    uint toStake = depositedBalances[msg.sender];
-    depositedBalances[msg.sender] = 0;
-    // track staked balance
-    stakedBalances[msg.sender] = stakedBalances[msg.sender].add(toStake);
+  function stake() public {
+    // * update mappings
+    // * send total balance to stakeContract
+    // owner is user[0] do not include in this calculation
+    uint toStake;
+    for (uint i = 1; i < users.length; i++) {
+      uint amount = requestStake[users[i]];
+      toStake = toStake.add(amount);
+      stakedBalances[users[i]] = stakedBalances[users[i]].add(amount);
+      requestStake[users[i]] = 0;
+    }
 
     // track total staked
     totalStaked = totalStaked.add(toStake);
-
-    // record block number for calculating profit distribution
-    blockStaked[msg.sender] = block.number;
 
     // this is how to send ether with a call to an external contract
     sc.deposit.value(toStake)();
@@ -198,21 +207,25 @@ contract StakePool {
     *
     */
   function unstake() public {
-    // require(stakedBalances[msg.sender] >= amount);
-    // track total staked -- always unstake full amount
-    uint amount = stakedBalances[msg.sender];
-    stakedBalances[msg.sender] = stakedBalances[msg.sender].sub(amount);
-    depositedBalances[msg.sender] = depositedBalances[msg.sender].add(amount);
-    totalStaked = totalStaked.sub(amount);
-    // record block number for calculating profit distribution
-    blockUnstaked[msg.sender] = block.number;
+    uint unStake;
+    // owner is user[0] do not include in this calculation
+    for (uint i = 1; i < users.length; i++) {
+      uint amount = requestUnStake[users[i]];
+      unStake = unStake.add(amount);
+      stakedBalances[users[i]] = stakedBalances[users[i]].sub(amount);
+      depositedBalances[users[i]] = depositedBalances[users[i]].add(amount);
+      requestUnStake[users[i]] = 0;
+    }
+
+    // track total staked
+    totalStaked = totalStaked.sub(unStake);
 
     // sc.withdraw(amount, msg.sender);
-    sc.withdraw(amount);
+    sc.withdraw(unStake);
 
     emit NotifyStaked(
       msg.sender,
-      -amount,
+      -unStake,
       block.number
     );
   }
@@ -272,13 +285,6 @@ contract StakePool {
     return requestUnStake[msg.sender];
   }
 
-  /** @dev track user request to enter next staking period
-    */
-  mapping(address => uint) private requestStake;
-  /** @dev track user request to exit current staking period
-    */
-  mapping(address => uint) private requestUnStake;
-
   /** @dev user can request to enter next staking period
     */
   function requestNextStakingPeriod() public {
@@ -291,7 +297,7 @@ contract StakePool {
   /** @dev user can request to exit at end of current staking period
     */
   function requestExitAtEndOfCurrentStakingPeriod(uint amount) public {
-    require(stakedBalances[msg.sender] > amount);
+    require(stakedBalances[msg.sender] >= amount);
     requestUnStake[msg.sender] = amount;
   }
 }

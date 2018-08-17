@@ -14,6 +14,7 @@ contract(`User StakePool interactionions : ${fn}`, function (accounts) {
   let pool = null
   let stak = null
   let log = null
+
   before('show contract addresses', function () {
     log = fs.createWriteStream(`./test/logs/${fn}.log`)
     log.write(`${(new Date()).toISOString()}\n`)
@@ -113,30 +114,23 @@ contract(`User StakePool interactionions : ${fn}`, function (accounts) {
     })
   })
 
-  tests.forEach(function (test, index) {
-    it.skip(`should be able to stake deposited balance for account:${index + 1}`, function () {
-      return StakePool.deployed().then(function (instance) {
-        return instance.stake(
-          {
-            from: test,
-            gas: '200000'
-          }
-        )
-      }).then(function (trxObj) {
-        assert.exists(trxObj)
-        log.write(JSON.stringify(trxObj, null, 2))
-        log.write('\n')
+  it(`should be able to stake requested balance for all accounts`, function () {
+    return StakePool.deployed().then(function (instance) {
+      return instance.stake()
+    }).then(function (trxObj) {
+      assert.exists(trxObj)
+      log.write(JSON.stringify(trxObj, null, 2))
+      log.write('\n')
 
-        assert.exists(trxObj.logs)
-        trxObj.logs.forEach(function (e) {
-          assert.oneOf(e.event, ['NotifyDepositSC', 'NotifyStaked'])
-        })
+      assert.exists(trxObj.logs)
+      trxObj.logs.forEach(function (e) {
+        assert.oneOf(e.event, ['NotifyDepositSC', 'NotifyStaked'])
       })
     })
   })
 
   tests.forEach(function (test, index) {
-    it.skip(`should now have staked balance of 1 ether for account:${index + 1}`, function () {
+    it(`should now have staked balance of 1 ether for account:${index + 1}`, function () {
       return StakePool.deployed().then(function (instance) {
         return instance.getStakedBalance({from: test})
       }).then(function (balance) {
@@ -145,7 +139,7 @@ contract(`User StakePool interactionions : ${fn}`, function (accounts) {
     })
   })
 
-  it.skip(`should have a balance of 2 ether in StakeContract`, function () {
+  it(`should have a balance of 2 ether in StakeContract`, function () {
     return StakeContract.deployed().then(function (instance) {
       return web3.eth.getBalance(instance.address).toNumber()
     }).then(function (balance) {
@@ -153,7 +147,7 @@ contract(`User StakePool interactionions : ${fn}`, function (accounts) {
     })
   })
 
-  it.skip('should have zero balance in StakePool', function () {
+  it('should have zero balance in StakePool', function () {
     return StakePool.deployed().then(function (instance) {
       return web3.eth.getBalance(instance.address).toNumber()
     }).then(function (balance) {
@@ -161,30 +155,37 @@ contract(`User StakePool interactionions : ${fn}`, function (accounts) {
     })
   })
 
-  it('should allow users to request unstake')
-
   tests.forEach(function (test, index) {
-    it.skip(`should be able to unstake deposited balance for account:${index + 1}`, function () {
+    it(`should allow account:${index + 1} to request that staked ether is unstaked in next round`, function () {
       return StakePool.deployed().then(function (instance) {
-        return instance.unstake(
-          {
-            from: test,
-            gas: '300000'
-          }
+        return instance.requestExitAtEndOfCurrentStakingPeriod(
+          web3.toWei(1, 'ether'),
+          { from: test }
         )
       }).then(function (trxObj) {
+        assert.exists(trxObj)
         log.write(JSON.stringify(trxObj, null, 2))
         log.write('\n')
-        assert.exists(trxObj)
-        assert.exists(trxObj.logs)
-        trxObj.logs.forEach(function (e) {
-          assert.oneOf(e.event, ['NotifyWithdrawal', 'NotifyStaked', 'FallBackSP'])
-        })
       })
     })
   })
 
-  it.skip('should now have zero balance in StakeContract', function () {
+  it(`should be able to unstake requested balances for all accounts`, function () {
+    return StakePool.deployed().then(function (instance) {
+      return instance.unstake()
+    }).then(function (trxObj) {
+      log.write(JSON.stringify(trxObj, null, 2))
+      log.write('\n')
+      assert.exists(trxObj)
+      assert.exists(trxObj.logs)
+      trxObj.logs.forEach(function (e) {
+        log.write(e.event + '\n')
+        assert.oneOf(e.event, ['NotifyWithdrawal', 'NotifyStaked', 'FallBackSP'])
+      })
+    })
+  })
+
+  it('should now have zero balance in StakeContract', function () {
     return StakeContract.deployed().then(function (instance) {
       return web3.eth.getBalance(instance.address).toNumber()
     }).then(function (balance) {
@@ -192,7 +193,7 @@ contract(`User StakePool interactionions : ${fn}`, function (accounts) {
     })
   })
 
-  it.skip('should now have balance of 2 ether in StakePool', function () {
+  it('should now have balance of 2 ether in StakePool', function () {
     return StakePool.deployed().then(function (instance) {
       return web3.eth.getBalance(instance.address).toNumber()
     }).then(function (balance) {
@@ -200,7 +201,7 @@ contract(`User StakePool interactionions : ${fn}`, function (accounts) {
     })
   })
 
-  it.skip('should NOT be able to return ether to wrong account (fails as expected)', async function () {
+  it('should NOT be able to return ether to wrong account (fails as expected)', async function () {
     try {
       await StakePool.deployed().then(function (instance) {
         return instance.withdraw(web3.toWei(1, 'ether'), {from: accounts[9]})
@@ -213,7 +214,7 @@ contract(`User StakePool interactionions : ${fn}`, function (accounts) {
   })
 
   tests.forEach(function (test, index) {
-    it.skip(`should be able to return ether to correct account: ${index + 1}`, function () {
+    it(`should be able to return ether to correct account: ${index + 1}`, function () {
       return StakePool.deployed().then(function (instance) {
         return instance.withdraw(
           web3.toWei(1, 'ether'),
@@ -229,7 +230,7 @@ contract(`User StakePool interactionions : ${fn}`, function (accounts) {
     })
   })
 
-  it.skip('should finish with zero balance in StakePool', function () {
+  it('should finish with zero balance in StakePool', function () {
     return StakePool.deployed().then(function (instance) {
       return web3.eth.getBalance(instance.address).toNumber()
     }).then(function (balance) {
