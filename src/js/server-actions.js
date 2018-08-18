@@ -2,26 +2,29 @@
 
 const Srv = {
 
+  web3Provider: null,
   intervalID: null,
 
   startTimerNow: function () {
-    this.intervalID = window.setInterval(this.stakePeriod, 5000)
+    Srv.intervalID = window.setInterval(Srv.stakePeriod, 5000)
   },
 
   stakePeriod: function () {
     // actions
     console.log('timer callback')
 
-    if ($('#s_req_stake').val() > 0) {
-      this.testOwnerStake()
+    if ($('#s_req_stake').text() > 0) {
+      console.log('call testOwnerStake')
+      console.log(Srv)
+      Srv.testOwnerStake()
     }
-    if ($('#s_req_unstake').val() > 0) {
-      this.testOwnerUnStake()
+    if ($('#s_req_unstake').text() > 0) {
+      Srv.testOwnerUnStake()
     }
   },
 
   stopTimerNow: function () {
-    clearInterval(this.intervalID)
+    clearInterval(Srv.intervalID)
   },
 
   testOwnerStake: function () {
@@ -46,4 +49,6 @@ const Srv = {
   }
 }
 
-Srv.startTimerNow()
+// this isn't working as planned, it pops up a confirm from Metamask
+// TODO: add new web3 to not use Metamask
+// Srv.startTimerNow()
