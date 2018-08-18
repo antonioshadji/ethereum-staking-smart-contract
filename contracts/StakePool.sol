@@ -259,6 +259,17 @@ contract StakePool {
     );
   }
 
+  /** @dev retreive current state of users funds
+    */
+  function getState() public view returns (uint[]) {
+    uint[] memory state = new uint[](4);
+    state[0] = depositedBalances[msg.sender];
+    state[1] = requestStake[msg.sender];
+    state[2] = requestUnStake[msg.sender];
+    state[3] = stakedBalances[msg.sender];
+    return state;
+  }
+
   /** @dev retreive balance from contract
     * @return uint current value of deposit
     */
@@ -291,7 +302,8 @@ contract StakePool {
     require(depositedBalances[msg.sender] > 0);
     uint amount = depositedBalances[msg.sender];
     depositedBalances[msg.sender] = 0;
-    requestStake[msg.sender] = amount;
+    // TODO: add test for adding additional funds to stake pool
+    requestStake[msg.sender] = requestStake[msg.sender].add(amount);
     emit NotifyStaked(msg.sender, amount, block.number);
   }
 
@@ -299,7 +311,7 @@ contract StakePool {
     */
   function requestExitAtEndOfCurrentStakingPeriod(uint amount) public {
     require(stakedBalances[msg.sender] >= amount);
-    requestUnStake[msg.sender] = amount;
+    requestUnStake[msg.sender] = requestUnStake[msg.sender].add(amount);
     emit NotifyStaked(msg.sender, amount, block.number);
   }
 }
