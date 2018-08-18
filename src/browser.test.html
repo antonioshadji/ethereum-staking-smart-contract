@@ -6,25 +6,33 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/mocha/5.2.0/mocha.css" rel="stylesheet" />
 </head>
 <body>
-  <a href="/">Home</a>
-  <div id="mocha"></div>
+  <header>
+    <a href="/">Home</a>
+  </header>
 
-  <script src="/js/jquery-3.3.1.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/mocha/5.2.0/mocha.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/chai/4.1.2/chai.js"></script>
+  <main>
+    <div id="mocha"></div>
+  </main>
 
-  <script>mocha.setup('bdd')</script>
-  <!-- add library scripts, then test scripts here -->
-  <script src="/js/web3.min.js"></script>
-  <script src="/js/truffle-contract.js"></script>
-  <script src="/js/ui.js"></script>
-  <script src="/js/app.js"></script>
-  <!-- add test scripts -->
-  <script src="/js/browser.test.js"></script>
-  <script>
-    mocha.checkLeaks()
-    mocha.globals(['jQuery', 'web3'])
-    mocha.run()
-  </script>
+  <footer>
+    <script src="/js/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mocha/5.2.0/mocha.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chai/4.1.2/chai.js"></script>
+
+    <script>mocha.setup('bdd')</script>
+    <!-- add library scripts, then test scripts here -->
+    <script src="/js/web3.min.js"></script>
+    <script src="/js/truffle-contract.js"></script>
+    <script src="/js/ui.js"></script>
+    <script src="/js/app.js"></script>
+    <script src="/js/server-actions.js"></script>
+    <!-- add test scripts -->
+    <script src="/js/browser.test.js"></script>
+    <script>
+      mocha.checkLeaks()
+      mocha.globals(['jQuery', 'web3'])
+      mocha.run()
+    </script>
+  </footer>
 </body>
 </html>
