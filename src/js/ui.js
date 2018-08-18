@@ -15,6 +15,13 @@ const UI = {
     $(id).prop('disabled', false)
   },
 
+  setBalances: function (arr) {
+    $('#s_value').text(arr[0])
+    $('#s_req_stake').text(arr[1])
+    $('#s_req_unstake').text(arr[2])
+    $('#s_staked').text(arr[3])
+  },
+
   setup: function () {
     /* uttily code for all sites */
     $('#year').text(new Date().getFullYear())
