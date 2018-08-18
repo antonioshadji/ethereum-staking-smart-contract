@@ -96,8 +96,9 @@ const App = {
     }).then(function (result) {
       console.log('transaction submitted by user')
       console.log(result)
-      let b = web3.fromWei(result.logs[0].args.balance.toNumber(), 'ether')
-      $('#s_value').text(b)
+      // let b = web3.fromWei(result.logs[0].args.balance.toNumber(), 'ether')
+      // $('#s_value').text(b)
+      App.getBalance()
     }).catch(function (err) {
       console.log('transaction rejected by user')
       console.log(err.message)
@@ -109,9 +110,8 @@ const App = {
       // TODO: this method below will allow consolidating all get balance functions
       return instance['getBalance'].call()
     }).then(function (value) {
-      console.log('Value: ', value)
       let v = web3.fromWei(value.toNumber(), 'ether')
-      console.log('Update Balance: ', v)
+      console.log(`Value: ${value} (${v})`)
       // value is in wei, display in ether
       // TODO: update UI with balance
       $('#s_value').text(v)
@@ -126,9 +126,8 @@ const App = {
     App.contracts.StakePool.deployed().then(function (instance) {
       return instance.getStakedBalance.call()
     }).then(function (value) {
-      console.log('Value: ', value)
       let v = web3.fromWei(value.toNumber(), 'ether')
-      console.log('Update Balance: ', v)
+      console.log(`Value: ${value} (${v})`)
       // value is in wei, display in ether
       // TODO: update UI with balance
       $('#s_staked').text(v)
@@ -143,9 +142,8 @@ const App = {
     App.contracts.StakePool.deployed().then(function (instance) {
       return instance.getStakeRequestBalance.call()
     }).then(function (value) {
-      console.log('Value: ', value)
       let v = web3.fromWei(value.toNumber(), 'ether')
-      console.log('Update Balance: ', v)
+      console.log(`Value: ${value} (${v})`)
       // value is in wei, display in ether
       // TODO: update UI with balance
       $('#s_req_stake').text(v)
@@ -160,9 +158,8 @@ const App = {
     App.contracts.StakePool.deployed().then(function (instance) {
       return instance.getUnStakeRequestBalance.call()
     }).then(function (value) {
-      console.log('Value: ', value)
       let v = web3.fromWei(value.toNumber(), 'ether')
-      console.log('Update Balance: ', v)
+      console.log(`Value: ${value} (${v})`)
       // value is in wei, display in ether
       // TODO: update UI with balance
       $('#s_req_unstake').text(v)
@@ -204,8 +201,9 @@ const App = {
       if (result) {
         console.log('success')
         console.log(result)
-        let b = web3.fromWei(result.logs[0].args.finalBal.toNumber(), 'ether')
-        $('#s_value').text(b)
+        // let b = web3.fromWei(result.logs[0].args.finalBal.toNumber(), 'ether')
+        // $('#s_value').text(b)
+        App.getBalance()
       } else {
         console.log('failed')
         console.log(result)
@@ -217,9 +215,20 @@ const App = {
 
   requestStake: function (value) {
     App.contracts.StakePool.deployed().then(function (instance) {
-      return instance.requestNextStakingPeriod()
+      // TODO: remove hardcoded gas estimate
+      return instance.requestNextStakingPeriod({gas: 100000})
     }).then(function (trxObj) {
       console.log(trxObj)
+      if (trxObj.logs[0].args.hasOwnProperty('amount')) {
+        // let b = web3.fromWei(trxObj.logs[0].args.amount.toNumber(), 'ether')
+        console.log(`amount:`)
+        // $('#s_req_stake').text(b)
+        // $('#s_value').text('0')
+        App.getBalance()
+        App.getStakeRequestBalance()
+      } else {
+        console.log('log arg amount not found')
+      }
     }).catch(function (err) {
       console.error(err)
     })
@@ -237,8 +246,22 @@ const App = {
       )
     }).then(function (trxObj) {
       console.log(trxObj)
+      // let b = web3.fromWei(trxObj.logs[0].args.amount.toNumber(), 'ether')
+      // $('#s_req_unstake').text(b)
+      App.getUnStakeRequestBalance()
     }).catch(function (err) {
       console.error(err)
+    })
+  },
+
+  getState: function () {
+    App.contracts.StakePool.deployed().then(function (instance) {
+      // why returning MetaMask - RPC Error: Internal JSON-RPC error. 32603?
+      // contract function was compiling, not working properly ??(guess)
+      return instance.getState.call()
+    }).then(function (stateArr) {
+      console.log(stateArr)
+      return stateArr
     })
   },
 
@@ -274,5 +297,4 @@ const App = {
     })
     // netId also available with console.log(web3.version.network)
   }
-
 }
