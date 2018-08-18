@@ -51,7 +51,7 @@ const UI = {
       console.log($('#i_value').val())
       // default account is null
       // console.log(web3.eth.defaultAccount)
-      App.sendTransaction($('#i_value').val())
+      App.depositFunds($('#i_value').val())
       $('#i_value').val('')
     })
 
@@ -60,18 +60,20 @@ const UI = {
       console.log($('#i_withdrawal').val())
       // default account is null
       // console.log(web3.eth.defaultAccount)
-      App.makeWithdrawal($('#i_withdrawal').val())
+      App.withdrawFunds($('#i_withdrawal').val())
       $('#i_withdrawal').val('')
     })
 
     $('#b_stake').on('click', () => {
       console.log('click b_stake')
       App.requestStake()
+      $('#i_stake').val('')
     })
 
     $('#b_ustake').on('click', () => {
       console.log('click b_ustake')
       App.requestUnStake($('#i_ustake').val())
+      $('#i_ustake').val('')
     })
 
     // browser test page only available on test server

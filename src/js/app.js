@@ -83,7 +83,7 @@ const App = {
     return App.account
   },
 
-  sendTransaction: function (value) {
+  depositFunds: function (value) {
     // TODO: value must be <= 18 decimal places -- otherwise fails
     App.contracts.StakePool.deployed().then(function (instance) {
       // transaction functions are objects of contract instance
@@ -173,7 +173,7 @@ const App = {
     })
   },
 
-  makeWithdrawal: function (value) {
+  withdrawFunds: function (value) {
     web3.eth.getGasPrice((err, price) => {
       if (err) console.error(err)
       console.log(`gas price:${price.toString(10)}`)
@@ -227,30 +227,14 @@ const App = {
 
   requestUnStake: function (value) {
     App.contracts.StakePool.deployed().then(function (instance) {
+      // TODO: use estimateGas instead of hard coded value
       return instance.requestExitAtEndOfCurrentStakingPeriod(
         web3.toWei(value, 'ether'),
-        {from: App.account}
+        {
+          from: App.account,
+          gas: 100000
+        }
       )
-    }).then(function (trxObj) {
-      console.log(trxObj)
-    }).catch(function (err) {
-      console.error(err)
-    })
-  },
-
-  testOwnerStake: function () {
-    App.contracts.StakePool.deployed().then(function (instance) {
-      return instance.stake()
-    }).then(function (trxObj) {
-      console.log(trxObj)
-    }).catch(function (err) {
-      console.error(err)
-    })
-  },
-
-  testOwnerUnStake: function () {
-    App.contracts.StakePool.deployed().then(function (instance) {
-      return instance.unstake()
     }).then(function (trxObj) {
       console.log(trxObj)
     }).catch(function (err) {
