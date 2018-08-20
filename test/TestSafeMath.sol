@@ -3,9 +3,29 @@ pragma solidity ^0.4.24;
 import "truffle/Assert.sol";
 import "truffle/DeployedAddresses.sol";
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
+import "../contracts/StakeContract.sol";
+import "../contracts/StakePool.sol";
 
 contract TestSafeMath {
   using SafeMath for uint;
+
+  // https://truffleframework.com/docs/truffle/testing/writing-tests-in-solidity#testing-ether-transactions
+  uint public initialBalance = 6 ether;
+  function testSendEtherInitialize() public {
+   // StakePool sp = StakePool(DeployedAddresses.StakePool());
+   //  StakeContract sc = StakeContract(DeployedAddresses.StakeContract());
+    Assert.equal(initialBalance, 6 ether, 'test ether value');
+    Assert.equal(initialBalance, 6000000000000000000, 'test wei value');
+    // initialBalance allows to send up to a limit of ether but does not deposit
+    // the balance directly into the contracts balance. Ether must be transfered
+    DeployedAddresses.StakeContract().transfer(1 ether);
+    Assert.balanceEqual(DeployedAddresses.StakeContract(), 1 ether, 'SC balance not increased');
+
+    DeployedAddresses.StakeContract().transfer(2 ether);
+    DeployedAddresses.StakePool().transfer(3 ether);
+    Assert.balanceEqual(DeployedAddresses.StakeContract(), 3000000000000000000, 'SC did not receive eth');
+    Assert.balanceEqual(DeployedAddresses.StakePool(), 3 ether, 'SP did not receive eth');
+  }
 
   function testChainedAdd() public {
     // test if using SafeMath for uint modifies original values or only returns
