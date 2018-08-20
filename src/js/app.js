@@ -54,7 +54,6 @@ const App = {
     $.getJSON(`./js/${name}.json`, function (data) {
       console.log('Contract Data: ', data)
       // instantiate new contract
-      // TODO: update network programattically
       App.contracts[name] = TruffleContract(data)
       App.contracts[name].setProvider(App.web3Provider)
     })
