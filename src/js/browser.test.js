@@ -1,4 +1,4 @@
-/* global describe, it, before, App, chai */
+/* global describe, it, before, Srv, App, chai */
 
 /* this file is for inbrowser testing
  * for jquery testing here are ideas
@@ -11,6 +11,7 @@ describe('Test browser code', function () {
   before(function () {
     // runs before all tests in this block
     App.init()
+    Srv.init()
   })
 
   describe('App.js', function () {
@@ -19,9 +20,23 @@ describe('Test browser code', function () {
     })
   })
 
-  describe('web3Provider', function () {
+  describe('Srv -- server-actions.js', function () {
+    it('should be present', function () {
+      assert.exists(Srv, 'Srv is null or undefined')
+    })
+  })
+
+  describe('App web3Provider', function () {
     it('should be available', function () {
       assert.isOk(App.web3Provider, 'Provider is not available')
+    })
+    describe('Srv web3Provider', function () {
+      it('should be available', function () {
+        assert.isOk(Srv.web3Provider, 'Provider is not available')
+      })
+      it('should not be same as App.web3Provider', function () {
+        assert.notStrictEqual(Srv.web3Provider, App.web3Provider)
+      })
     })
   })
 })

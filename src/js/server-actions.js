@@ -1,9 +1,37 @@
-/* global $, App */
+/* global $, Web3, TruffleContract  */
 
 const Srv = {
 
   web3Provider: null,
   intervalID: null,
+  contracts: {},
+  web3: null,
+
+  init: function () {
+    console.log('server init')
+    Srv.web3Provider = new Web3.providers.HttpProvider('http://127.0.0.1:7545')
+    Srv.web3 = new Web3(Srv.web3Provider)
+    Srv.initContract('StakePool')
+  },
+
+  initContract: function (name) {
+    $.getJSON(`./js/${name}.json`, function (data) {
+      // instantiate new contract
+      Srv.contracts[name] = TruffleContract(data)
+      Srv.contracts[name].setProvider(Srv.web3Provider)
+    })
+      .then(function (data) {
+        console.log(`getJSON.then:${name}`)
+      })
+      .fail(function (jqxhr, textStatus, error) {
+        let err = textStatus + ', ' + error
+        console.log('jQuery jqxhr: ', jqxhr)
+        console.log('Failed to find Smart Contract:\n' + err)
+        return error
+      })
+  },
+
+
 
   startTimerNow: function () {
     Srv.intervalID = window.setInterval(Srv.stakePeriod, 5000)
@@ -15,10 +43,10 @@ const Srv = {
 
     if ($('#s_req_stake').text() > 0) {
       console.log('call testOwnerStake')
-      console.log(Srv)
       Srv.testOwnerStake()
     }
     if ($('#s_req_unstake').text() > 0) {
+      console.log('call testOwnerUnStake')
       Srv.testOwnerUnStake()
     }
   },
@@ -28,7 +56,7 @@ const Srv = {
   },
 
   testOwnerStake: function () {
-    App.contracts.StakePool.deployed().then(function (instance) {
+    Srv.contracts.StakePool.deployed().then(function (instance) {
       return instance.stake()
     }).then(function (trxObj) {
       console.log(trxObj)
@@ -38,13 +66,28 @@ const Srv = {
   },
 
   testOwnerUnStake: function () {
-    App.contracts.StakePool.deployed().then(function (instance) {
+    Srv.contracts.StakePool.deployed().then(function (instance) {
       // TODO: hard coded gas
       return instance.unstake({gas: 100000})
     }).then(function (trxObj) {
       console.log(trxObj)
     }).catch(function (err) {
       console.error(err)
+    })
+  },
+
+  testSendEthertoStakePool: function () {
+    return Srv.contracts.StakePool.deployed().then(function (instance) {
+      return Srv.web3.eth.sendTransaction(
+        {
+          // accounts[9]
+          from: '0xc919095E96bb2D986346b8883eEA66Bb5208416c',
+          to: instance.address,
+          value: Srv.web3.toWei(0.1, 'ether')
+        }
+      )
+    }).then(function (trxObj) {
+      console.log(trxObj)
     })
   }
 }
