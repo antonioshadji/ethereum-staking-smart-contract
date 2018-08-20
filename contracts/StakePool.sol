@@ -110,19 +110,25 @@ contract StakePool {
     */
   function removeUser(address _user) internal {
     uint index = userIndex[_user];
+    // never remove owner from 0 slot in user array
+    if (index == 0) return;
+    // user is not last user
     if (index < users.length.sub(1)) {
       address lastUser = users[users.length.sub(1)];
       users[index] = lastUser;
       userIndex[lastUser] = index;
     }
+    // this line removes last user
     users.length = users.length.sub(1);
   }
 
   /** @dev add a user to users array
     */
   function addUser(address _user) internal {
+    if (_user == owner ) return;
     if (isExistingUser(_user)) return;
     users.push(_user);
+    // new user is currently last in users array
     userIndex[_user] = users.length.sub(1);
   }
   /************************ USER MANAGEMENT **********************************/
@@ -184,9 +190,8 @@ contract StakePool {
   function stake() public {
     // * update mappings
     // * send total balance to stakeContract
-    // owner is user[0] do not include in this calculation
     uint toStake;
-    for (uint i = 1; i < users.length; i++) {
+    for (uint i = 0; i < users.length; i++) {
       uint amount = requestStake[users[i]];
       toStake = toStake.add(amount);
       stakedBalances[users[i]] = stakedBalances[users[i]].add(amount);
@@ -211,8 +216,7 @@ contract StakePool {
     */
   function unstake() public {
     uint unStake;
-    // owner is user[0] do not include in this calculation
-    for (uint i = 1; i < users.length; i++) {
+    for (uint i = 0; i < users.length; i++) {
       uint amount = requestUnStake[users[i]];
       unStake = unStake.add(amount);
       stakedBalances[users[i]] = stakedBalances[users[i]].sub(amount);
