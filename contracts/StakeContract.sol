@@ -62,12 +62,13 @@ contract StakeContract {
 
     event FallBackSC(
       address sender,
-      uint value
+      uint value,
+      uint blockNumber
     );
 
   function () external payable {
     // this line caused a revert (not enough gas when contract transfer/send)
     // depositedBalances[msg.sender] += msg.value;
-    emit FallBackSC(msg.sender, msg.value);
+    emit FallBackSC(msg.sender, msg.value, block.number);
   }
 }

@@ -73,14 +73,15 @@ contract StakePool {
     * it is assumed that only funds received will be from stakeContract
     */
   function () external payable {
-    emit FallBackSP(msg.sender, msg.value);
+    emit FallBackSP(msg.sender, msg.value, block.number);
   }
 
   /** @dev notify when funds received at contract
     */
   event FallBackSP(
     address sender,
-    uint value
+    uint value,
+    uint blockNumber
   );
 
   /** @dev restrict function to only work when called by owner
@@ -137,10 +138,10 @@ contract StakePool {
   /** @dev withdraw profits to owner account
     */
   function getOwnersProfits() public onlyOwner {
-    // TODO: test again after ownersBalance > 0
-    // require(ownersBalance > 0);
+    require(ownersBalance > 0);
     uint valueWithdrawn = ownersBalance;
-    owner.transfer(ownersBalance);
+    ownersBalance = 0;
+    owner.transfer(valueWithdrawn);
     emit NotifyProfitWithdrawal(valueWithdrawn);
   }
 
