@@ -306,7 +306,7 @@ contract StakePool {
     depositedBalances[msg.sender] = 0;
     // TODO: add test for adding additional funds to stake pool
     requestStake[msg.sender] = requestStake[msg.sender].add(amount);
-    emit NotifyStaked(msg.sender, amount, block.number);
+    emit NotifyStaked(msg.sender, requestStake[msg.sender], block.number);
   }
 
   /** @dev user can request to exit at end of current staking period
@@ -314,7 +314,7 @@ contract StakePool {
   function requestExitAtEndOfCurrentStakingPeriod(uint amount) public {
     require(stakedBalances[msg.sender] >= amount);
     requestUnStake[msg.sender] = requestUnStake[msg.sender].add(amount);
-    emit NotifyStaked(msg.sender, amount, block.number);
+    emit NotifyStaked(msg.sender, requestUnStake[msg.sender], block.number);
   }
 }
 

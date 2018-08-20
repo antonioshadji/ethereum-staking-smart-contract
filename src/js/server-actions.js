@@ -1,4 +1,4 @@
-/* global $, Web3, TruffleContract  */
+/* global App, $, Web3, TruffleContract  */
 
 const Srv = {
 
@@ -31,8 +31,6 @@ const Srv = {
       })
   },
 
-
-
   startTimerNow: function () {
     Srv.intervalID = window.setInterval(Srv.stakePeriod, 5000)
   },
@@ -57,9 +55,11 @@ const Srv = {
 
   testOwnerStake: function () {
     Srv.contracts.StakePool.deployed().then(function (instance) {
-      return instance.stake()
+      // TODO: hard coded gas
+      return instance.stake({gas: 200000})
     }).then(function (trxObj) {
       console.log(trxObj)
+      return App.getState()
     }).catch(function (err) {
       console.error(err)
     })
@@ -68,9 +68,10 @@ const Srv = {
   testOwnerUnStake: function () {
     Srv.contracts.StakePool.deployed().then(function (instance) {
       // TODO: hard coded gas
-      return instance.unstake({gas: 100000})
+      return instance.unstake({gas: 200000})
     }).then(function (trxObj) {
       console.log(trxObj)
+      return App.getState()
     }).catch(function (err) {
       console.error(err)
     })
@@ -92,6 +93,4 @@ const Srv = {
   }
 }
 
-// this isn't working as planned, it pops up a confirm from Metamask
-// TODO: add new web3 to not use Metamask
-// Srv.startTimerNow()
+Srv.startTimerNow()
