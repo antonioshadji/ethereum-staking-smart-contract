@@ -124,6 +124,8 @@ contract StakePool {
     users.push(_user);
     userIndex[_user] = users.length.sub(1);
   }
+  /************************ USER MANAGEMENT **********************************/
+
 
   /** @dev set staking contract address
     */
