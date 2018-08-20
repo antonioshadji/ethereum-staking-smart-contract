@@ -97,7 +97,8 @@ const Srv = {
     Srv.contracts.StakePool.deployed().then(function (instance) {
       // why returning MetaMask - RPC Error: Internal JSON-RPC error. 32603?
       // contract function was compiling, not working properly ??(guess)
-      return instance.getState.call({from: Srv.account})
+      let userAccount = $('#t_account').text()
+      return instance.getState.call({from: userAccount})
     }).then(function (stateArr) {
       console.log(`getState: ${stateArr}`)
       Srv.processStateUpdate(stateArr)
