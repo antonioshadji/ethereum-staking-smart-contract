@@ -1,4 +1,4 @@
-/* global App, $, Web3, TruffleContract  */
+/* global $, Web3, TruffleContract  */
 
 const Srv = {
 
@@ -12,6 +12,7 @@ const Srv = {
     Srv.web3Provider = new Web3.providers.HttpProvider('http://127.0.0.1:7545')
     Srv.web3 = new Web3(Srv.web3Provider)
     Srv.initContract('StakePool')
+    Srv.startTimerNow()
   },
 
   initContract: function (name) {
@@ -21,7 +22,7 @@ const Srv = {
       Srv.contracts[name].setProvider(Srv.web3Provider)
     })
       .then(function (data) {
-        console.log(`getJSON.then:${name}`)
+        console.log(`getJSON.then: ${name}`)
       })
       .fail(function (jqxhr, textStatus, error) {
         let err = textStatus + ', ' + error
@@ -37,7 +38,7 @@ const Srv = {
 
   stakePeriod: function () {
     // actions
-    console.log('timer callback')
+    console.log('stake period transition (demo timer callback)')
 
     if ($('#s_req_stake').text() > 0) {
       console.log('call testOwnerStake')
@@ -59,7 +60,7 @@ const Srv = {
       return instance.stake({gas: 200000})
     }).then(function (trxObj) {
       console.log(trxObj)
-      return App.getState()
+      return Srv.getState()
     }).catch(function (err) {
       console.error(err)
     })
@@ -71,7 +72,7 @@ const Srv = {
       return instance.unstake({gas: 200000})
     }).then(function (trxObj) {
       console.log(trxObj)
-      return App.getState()
+      return Srv.getState()
     }).catch(function (err) {
       console.error(err)
     })
@@ -90,7 +91,26 @@ const Srv = {
     }).then(function (trxObj) {
       console.log(trxObj)
     })
+  },
+
+  getState: function () {
+    Srv.contracts.StakePool.deployed().then(function (instance) {
+      // why returning MetaMask - RPC Error: Internal JSON-RPC error. 32603?
+      // contract function was compiling, not working properly ??(guess)
+      return instance.getState.call({from: Srv.account})
+    }).then(function (stateArr) {
+      console.log(`getState: ${stateArr}`)
+      Srv.processStateUpdate(stateArr)
+      return stateArr
+    }).catch(function (err) {
+      console.error(`State update error: ${err.message}`)
+    })
+  },
+
+  processStateUpdate: function (stateArr) {
+    $('#s_value').text(Srv.web3.fromWei(stateArr[0], 'ether'))
+    $('#s_req_stake').text(Srv.web3.fromWei(stateArr[1], 'ether'))
+    $('#s_req_unstake').text(Srv.web3.fromWei(stateArr[2], 'ether'))
+    $('#s_staked').text(Srv.web3.fromWei(stateArr[3], 'ether'))
   }
 }
-
-Srv.startTimerNow()

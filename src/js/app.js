@@ -147,27 +147,6 @@ const App = {
     })
   },
 
-  getState: function () {
-    App.contracts.StakePool.deployed().then(function (instance) {
-      // why returning MetaMask - RPC Error: Internal JSON-RPC error. 32603?
-      // contract function was compiling, not working properly ??(guess)
-      return instance.getState.call({from: App.account})
-    }).then(function (stateArr) {
-      console.log(`getState: ${stateArr}`)
-      App.processStateUpdate(stateArr)
-      return stateArr
-    }).catch(function (err) {
-      console.error(`State update error: ${err.message}`)
-    })
-  },
-
-  processStateUpdate: function (stateArr) {
-    $('#s_value').text(web3.fromWei(stateArr[0], 'ether'))
-    $('#s_req_stake').text(web3.fromWei(stateArr[1], 'ether'))
-    $('#s_req_unstake').text(web3.fromWei(stateArr[2], 'ether'))
-    $('#s_staked').text(web3.fromWei(stateArr[3], 'ether'))
-  },
-
   depositFunds: function (value) {
     // TODO: value must be <= 18 decimal places -- otherwise fails
     App.contracts.StakePool.deployed().then(function (instance) {
