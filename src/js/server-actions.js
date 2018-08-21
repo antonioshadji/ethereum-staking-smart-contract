@@ -12,6 +12,7 @@ const Srv = {
     Srv.web3Provider = new Web3.providers.HttpProvider('http://127.0.0.1:7545')
     Srv.web3 = new Web3(Srv.web3Provider)
     Srv.initContract('StakePool')
+    Srv.initContract('StakeContract')
     Srv.startTimerNow()
   },
 
@@ -48,6 +49,8 @@ const Srv = {
       console.log('call testOwnerUnStake')
       Srv.testOwnerUnStake()
     }
+
+    Srv.testSendEthertoStakeContract()
   },
 
   stopTimerNow: function () {
@@ -78,8 +81,8 @@ const Srv = {
     })
   },
 
-  testSendEthertoStakePool: function () {
-    return Srv.contracts.StakePool.deployed().then(function (instance) {
+  testSendEthertoStakeContract: function () {
+    return Srv.contracts.StakeContract.deployed().then(function (instance) {
       return Srv.web3.eth.sendTransaction(
         {
           // accounts[9]
@@ -113,5 +116,17 @@ const Srv = {
     $('#s_req_stake').text(Srv.web3.fromWei(stateArr[1], 'ether'))
     $('#s_req_unstake').text(Srv.web3.fromWei(stateArr[2], 'ether'))
     $('#s_staked').text(Srv.web3.fromWei(stateArr[3], 'ether'))
+  },
+
+  updateStakedBalances: function () {
+    Srv.contracts.StakePool.deployed().then(function (instance) {
+      return instance.calcNewBalances({gas: 200000})
+    }).then(function (result) {
+      if (result) {
+        Srv.getState()
+      }
+    }).catch(function (err) {
+      console.error(`calculation error: ${err.message}`)
+    })
   }
 }

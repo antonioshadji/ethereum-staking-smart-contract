@@ -70,6 +70,11 @@ contract TestSafeMath {
     Assert.equal(var0.div(var1), 0, 'not expected');
   }
 
+  function testDecimals() public {
+    uint a = 0.99 * 100;
+    Assert.equal(a, 99, 'not expected');
+  }
+
   // by default array in global scope is storage type
   uint[] numbers;
   function testArray() public {

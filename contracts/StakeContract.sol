@@ -6,29 +6,9 @@ import 'zeppelin-solidity/contracts/math/SafeMath.sol';
 contract StakeContract {
   using SafeMath for uint;
 
-  /** @dev track balances of ether deposited to contract
-    */
-  mapping(address => uint) depositedBalances;
-
   /** @dev creates contract
     */
-  constructor() public {
-  }
-
-  /** @dev trigger notification of deposits
-    */
-  event NotifyDepositSC(
-    address sender,
-    uint amount,
-    uint balance
-  );
-
-  /** @dev deposit funds to the contract
-    */
-   function deposit() public payable {
-     depositedBalances[msg.sender] += msg.value;
-     emit NotifyDepositSC(msg.sender, msg.value, depositedBalances[msg.sender]);
-   }
+  constructor() public { }
 
   /** @dev trigger notification of withdrawal
     */
@@ -44,10 +24,8 @@ contract StakeContract {
     * not payable, not receiving funds
     */
   function withdraw(uint wdValue) public {
-    require(depositedBalances[msg.sender] >= wdValue);
-    uint startBalance = depositedBalances[msg.sender];
-    // open zeppelin sub function to ensure no overflow
-    depositedBalances[msg.sender] = depositedBalances[msg.sender].sub(wdValue);
+    uint startBalance = address(this).balance;
+    uint finalBalance = address(this).balance.sub(wdValue);
 
     // transfer & send will hit payee fallback function if a contract
     msg.sender.transfer(wdValue);
@@ -55,7 +33,7 @@ contract StakeContract {
     emit NotifyWithdrawalSC(
       msg.sender,
       startBalance,
-      depositedBalances[msg.sender],
+      finalBalance,
       wdValue
     );
   }
@@ -67,8 +45,8 @@ contract StakeContract {
     );
 
   function () external payable {
-    // this line caused a revert (not enough gas when contract transfer/send)
-    // depositedBalances[msg.sender] += msg.value;
+    // only 2300 gas available
+    // storage data costs at least 5000 for initialized values, 20k for new
     emit FallBackSC(msg.sender, msg.value, block.number);
   }
 }

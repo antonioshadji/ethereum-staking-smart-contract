@@ -14,6 +14,11 @@ contract StakePool {
     */
   uint private ownersBalance;
 
+  /** @dev owners payout percentage in uint
+    * 1 = 1%
+    */
+  uint8 private ownersPayout = 1;
+
   /** @dev address of staking contract
     */
   address public stakeContract;
@@ -202,7 +207,8 @@ contract StakePool {
     totalStaked = totalStaked.add(toStake);
 
     // this is how to send ether with a call to an external contract
-    sc.deposit.value(toStake)();
+    // sc.deposit.value(toStake)();
+    address(sc).transfer(toStake);
 
     emit NotifyStaked(
       msg.sender,
@@ -235,6 +241,22 @@ contract StakePool {
       -unStake,
       block.number
     );
+  }
+
+  /** @dev calculated new stakedBalances
+    */
+  function calcNewBalances() public returns (bool) {
+    uint earnings = address(sc).balance.sub(totalStaked);
+    if (earnings > 0) {
+      for (uint i = 0; i < users.length; i++) {
+        stakedBalances[users[i]] = stakedBalances[users[i]]
+          .add(earnings.mul(99)
+               .mul(stakedBalances[users[i]].div(totalStaked)).div(100));
+      }
+      return true;
+    } else {
+      return false;
+    }
   }
 
   /** @dev trigger notification of withdrawal
