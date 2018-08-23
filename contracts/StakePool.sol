@@ -246,11 +246,11 @@ contract StakePool is Pausable {
   /** @dev calculated new stakedBalances
     */
   function calcNewBalances() public onlyOwner returns (bool) {
-    uint totalSC = address(sc).balance;
-    uint earnings = totalSC.sub(totalStaked);
-    emit NotifyEarnings(earnings);
+    uint earnings = address(sc).balance.sub(totalStaked);
 
-    if (earnings > 0) {
+    if (totalStaked > 0 && earnings > 0) {
+      emit NotifyEarnings(earnings);
+
       for (uint i = 0; i < users.length; i++) {
         uint currentBalance = stakedBalances[users[i]];
 
@@ -264,9 +264,9 @@ contract StakePool is Pausable {
 
       totalStaked = address(sc).balance;
       return true;
-    } else {
-      return false;
     }
+
+    return false;
   }
 
   /** @dev trigger notification of withdrawal
@@ -307,32 +307,6 @@ contract StakePool is Pausable {
     state[2] = requestUnStake[msg.sender];
     state[3] = stakedBalances[msg.sender];
     return state;
-  }
-
-  /** @dev retreive balance from contract
-    * @return uint current value of deposit
-    */
-  function getBalance() public view returns (uint) {
-    return depositedBalances[msg.sender];
-  }
-
-  /** @dev retreive staked balance from contract
-    * @return uint current value of stake deposit
-    */
-  function getStakedBalance() public view returns (uint) {
-    return stakedBalances[msg.sender];
-  }
-  /** @dev retreive stake request balance from contract
-    * @return uint current value of stake request
-    */
-  function getStakeRequestBalance() public view returns (uint) {
-    return requestStake[msg.sender];
-  }
-  /** @dev retreive stake request balance from contract
-    * @return uint current value of stake request
-    */
-  function getUnStakeRequestBalance() public view returns (uint) {
-    return requestUnStake[msg.sender];
   }
 
   /** @dev user can request to enter next staking period

@@ -46,7 +46,6 @@ const App = {
     web3 = new Web3(App.web3Provider) // eslint-disable-line no-global-assign
     console.log('web3 version: ', web3.version.api)
     App.logNetwork()
-    App.updateAccount()
     App.initContract('StakePool')
   },
 
@@ -58,13 +57,10 @@ const App = {
       App.contracts[name].setProvider(App.web3Provider)
     })
       .then(function (data) {
-        console.log(`getJSON.then:${name}`)
+        console.log(`getJSON.then: ${name}`)
         console.log(`${name}:\n`, App.contracts[name])
         UI.enableElemById('#b_trx')
-        App.getBalance()
-        App.getStakedBalance()
-        App.getStakeRequestBalance()
-        App.getUnStakeRequestBalance()
+        App.updateAccount()
       })
       .fail(function (jqxhr, textStatus, error) {
         let err = textStatus + ', ' + error
@@ -76,76 +72,31 @@ const App = {
   },
 
   updateAccount: function () {
-    // TODO: this is specific to MetaMask web3
+    // this is specific to MetaMask, only 1 account available at a time
     App.account = web3.eth.accounts[0]
     console.log(App.account)
     $('#t_account').text(App.account)
+    App.getState()
     return App.account
   },
 
-  getBalance: function () {
+  getState: function () {
     App.contracts.StakePool.deployed().then(function (instance) {
-      // TODO: this method below will allow consolidating all get balance functions
-      return instance['getBalance'].call({from: App.account})
-    }).then(function (value) {
-      let v = web3.fromWei(value.toNumber(), 'ether')
-      console.log(`get deposit: Value: ${value} (${v})`)
-      // value is in wei, display in ether
-      // TODO: update UI with balance
-      $('#s_value').text(v)
+      return instance.getState.call({from: App.account})
+    }).then(function (stateArr) {
+      console.log(`getState: ${stateArr}`)
+      App.processStateUpdate(stateArr)
+      return stateArr
     }).catch(function (err) {
-      console.error('Contract not found. Ensure contract is deployed')
-      console.error(`Balance request failed: ${err.message}`)
-      $('#s_value').text('0')
+      console.error(`State update error: ${err.message}`)
     })
   },
 
-  getStakedBalance: function () {
-    App.contracts.StakePool.deployed().then(function (instance) {
-      return instance.getStakedBalance.call({from: App.account})
-    }).then(function (value) {
-      let v = web3.fromWei(value.toNumber(), 'ether')
-      console.log(`Value: ${value} (${v})`)
-      // value is in wei, display in ether
-      // TODO: update UI with balance
-      $('#s_staked').text(v)
-    }).catch(function (err) {
-      console.error('Contract not found. Ensure contract is deployed')
-      console.error(`Balance request failed: ${err.message}`)
-      $('#s_staked').text('0')
-    })
-  },
-
-  getStakeRequestBalance: function () {
-    App.contracts.StakePool.deployed().then(function (instance) {
-      return instance.getStakeRequestBalance.call({from: App.account})
-    }).then(function (value) {
-      let v = web3.fromWei(value.toNumber(), 'ether')
-      console.log(`get stake request: Value: ${value} (${v})`)
-      // value is in wei, display in ether
-      // TODO: update UI with balance
-      $('#s_req_stake').text(v)
-    }).catch(function (err) {
-      console.error('Contract not found. Ensure contract is deployed')
-      console.error(`Balance request failed: ${err.message}`)
-      $('#s_req_stake').text('0')
-    })
-  },
-
-  getUnStakeRequestBalance: function () {
-    App.contracts.StakePool.deployed().then(function (instance) {
-      return instance.getUnStakeRequestBalance.call()
-    }).then(function (value) {
-      let v = web3.fromWei(value.toNumber(), 'ether')
-      console.log(`Value: ${value} (${v})`)
-      // value is in wei, display in ether
-      // TODO: update UI with balance
-      $('#s_req_unstake').text(v)
-    }).catch(function (err) {
-      console.error('Contract not found. Ensure contract is deployed')
-      console.error(`Balance request failed: ${err.message}`)
-      $('#s_req_unstake').text('0')
-    })
+  processStateUpdate: function (stateArr) {
+    $('#s_value').text(web3.fromWei(stateArr[0], 'ether'))
+    $('#s_req_stake').text(web3.fromWei(stateArr[1], 'ether'))
+    $('#s_req_unstake').text(web3.fromWei(stateArr[2], 'ether'))
+    $('#s_staked').text(web3.fromWei(stateArr[3], 'ether'))
   },
 
   depositFunds: function (value) {
@@ -163,7 +114,7 @@ const App = {
       console.log(result)
       let b = web3.fromWei(result.logs[0].args.balance.toNumber(), 'ether')
       $('#s_value').text(b)
-      // return App.getBalance()
+      // TODO: should this be a call to getState?
     }).catch(function (err) {
       console.log('transaction rejected by user')
       console.log(err.message)
@@ -203,7 +154,7 @@ const App = {
         console.log(result)
         let b = web3.fromWei(result.logs[0].args.finalBal.toNumber(), 'ether')
         $('#s_value').text(b)
-        // App.getBalance()
+        // TODO: should this use a call to getState?
       } else {
         console.log('failed')
         console.log(result)
@@ -229,8 +180,7 @@ const App = {
         console.log(`amount: ${b}`)
         $('#s_req_stake').text(b)
         $('#s_value').text('0')
-        // App.getBalance()
-        // App.getStakeRequestBalance()
+        // TODO: should this be a call to getState?
       } else {
         console.log('log arg amount not found')
       }
@@ -253,7 +203,7 @@ const App = {
       console.log(trxObj)
       let b = web3.fromWei(trxObj.logs[0].args.amount.toNumber(), 'ether')
       $('#s_req_unstake').text(b)
-      // App.getUnStakeRequestBalance()
+      // TODO: should this be a call to getState?
     }).catch(function (err) {
       console.error(err)
     })

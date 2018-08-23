@@ -100,6 +100,9 @@ contract TestSafeMath {
     Assert.equal(numbers[1], 3, 'not expected');
     // throws invalid opcode VM Exception
     // Assert.equal(numbers[2], 3, 'not expected');
+    uint[] memory state = new uint[](4);
+    Assert.equal(state[0], 0, 'not expected');
+    Assert.equal(state[3], 0, 'not expected');
   }
 }
 
