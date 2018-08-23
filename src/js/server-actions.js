@@ -6,6 +6,7 @@ const Srv = {
   intervalID: null,
   contracts: {},
   web3: null,
+  ownerObj: {},
 
   init: function () {
     console.log('server init')
@@ -14,6 +15,9 @@ const Srv = {
     Srv.initContract('StakePool')
     Srv.initContract('StakeContract')
     Srv.startTimerNow()
+    // set parmeters for server actions
+    Srv.ownerObj.from = Srv.web3.eth.accounts[0]
+    Srv.ownerObj.gas = 200000
   },
 
   initContract: function (name) {
@@ -34,7 +38,7 @@ const Srv = {
   },
 
   startTimerNow: function () {
-    Srv.intervalID = window.setInterval(Srv.stakePeriod, 5000)
+    Srv.intervalID = window.setInterval(Srv.stakePeriod, 6000)
   },
 
   stakePeriod: function () {
@@ -59,25 +63,25 @@ const Srv = {
 
   testOwnerStake: function () {
     Srv.contracts.StakePool.deployed().then(function (instance) {
-      // TODO: hard coded gas
-      return instance.stake({gas: 200000})
+      // TODO: hard coded gas in ownerObj
+      return instance.stake(Srv.ownerObj)
     }).then(function (trxObj) {
-      console.log(trxObj)
+      console.dir(trxObj)
       return Srv.getState()
     }).catch(function (err) {
-      console.error(err)
+      console.dir(err)
     })
   },
 
   testOwnerUnStake: function () {
     Srv.contracts.StakePool.deployed().then(function (instance) {
-      // TODO: hard coded gas
-      return instance.unstake({gas: 200000})
+      // TODO: hard coded gas in ownerObj
+      return instance.unstake(Srv.ownerObj)
     }).then(function (trxObj) {
-      console.log(trxObj)
+      console.dir(trxObj)
       return Srv.getState()
     }).catch(function (err) {
-      console.error(err)
+      console.dir(err)
     })
   },
 
@@ -85,14 +89,16 @@ const Srv = {
     return Srv.contracts.StakeContract.deployed().then(function (instance) {
       return Srv.web3.eth.sendTransaction(
         {
-          // accounts[9]
-          from: '0xc919095E96bb2D986346b8883eEA66Bb5208416c',
+          // TODO: only works with ganache connected web3
+          from: Srv.web3.eth.accounts[9],
           to: instance.address,
-          value: Srv.web3.toWei(0.1, 'ether')
+          value: Srv.web3.toWei(0.01, 'ether')
         }
       )
     }).then(function (trxObj) {
-      console.log(trxObj)
+      console.dir(trxObj)
+    }).catch(function (err) {
+      console.dir(err)
     })
   },
 
@@ -120,10 +126,15 @@ const Srv = {
 
   updateStakedBalances: function () {
     Srv.contracts.StakePool.deployed().then(function (instance) {
-      return instance.calcNewBalances({gas: 200000})
+      // TODO: hard coded gas in ownerObj
+      return instance.calcNewBalances(Srv.ownerObj)
     }).then(function (result) {
+      console.log('updateStakedBalances:then')
+      console.dir(result)
       if (result) {
         Srv.getState()
+      } else {
+        console.error(`no state update received`)
       }
     }).catch(function (err) {
       console.error(`calculation error: ${err.message}`)
