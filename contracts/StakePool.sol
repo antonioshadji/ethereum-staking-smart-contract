@@ -243,16 +243,33 @@ contract StakePool {
     );
   }
 
+  event NotifyUpdate(
+    address user,
+    uint previousBalance,
+    uint newStakeBalence
+  );
+  event NotifyEarnings(uint earnings);
+
   /** @dev calculated new stakedBalances
     */
   function calcNewBalances() public returns (bool) {
-    uint earnings = address(sc).balance.sub(totalStaked);
+    uint totalSC = address(sc).balance;
+    uint earnings = totalSC.sub(totalStaked);
+    emit NotifyEarnings(earnings);
+
     if (earnings > 0) {
       for (uint i = 0; i < users.length; i++) {
-        stakedBalances[users[i]] = stakedBalances[users[i]]
-          .add(earnings.mul(99)
-               .mul(stakedBalances[users[i]].div(totalStaked)).div(100));
+        uint currentBalance = stakedBalances[users[i]];
+
+        stakedBalances[users[i]] =
+          currentBalance.add(
+            earnings.mul(99).div(100).mul(currentBalance).div(totalStaked)
+          );
+
+        emit NotifyUpdate(users[i], currentBalance, stakedBalances[users[i]]);
       }
+
+      totalStaked = address(sc).balance;
       return true;
     } else {
       return false;
