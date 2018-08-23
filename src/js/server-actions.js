@@ -6,7 +6,7 @@ const Srv = {
   intervalID: null,
   contracts: {},
   web3: null,
-  ownerObj: {},
+  adminObj: {},
 
   init: function () {
     console.log('server init')
@@ -16,8 +16,8 @@ const Srv = {
     Srv.initContract('StakeContract')
     Srv.startTimerNow()
     // set parmeters for server actions
-    Srv.ownerObj.from = Srv.web3.eth.accounts[0]
-    Srv.ownerObj.gas = 200000
+    Srv.adminObj.from = Srv.web3.eth.accounts[0]
+    Srv.adminObj.gas = 200000
   },
 
   initContract: function (name) {
@@ -64,8 +64,8 @@ const Srv = {
 
   testOwnerStake: function () {
     Srv.contracts.StakePool.deployed().then(function (instance) {
-      // TODO: hard coded gas in ownerObj
-      return instance.stake(Srv.ownerObj)
+      // TODO: hard coded gas in adminObj
+      return instance.stake(Srv.adminObj)
     }).then(function (trxObj) {
       console.dir(trxObj)
       return Srv.getState()
@@ -76,8 +76,8 @@ const Srv = {
 
   testOwnerUnStake: function () {
     Srv.contracts.StakePool.deployed().then(function (instance) {
-      // TODO: hard coded gas in ownerObj
-      return instance.unstake(Srv.ownerObj)
+      // TODO: hard coded gas in adminObj
+      return instance.unstake(Srv.adminObj)
     }).then(function (trxObj) {
       console.dir(trxObj)
       return Srv.getState()
@@ -127,8 +127,8 @@ const Srv = {
 
   updateStakedBalances: function () {
     Srv.contracts.StakePool.deployed().then(function (instance) {
-      // TODO: hard coded gas in ownerObj
-      return instance.calcNewBalances(Srv.ownerObj)
+      // TODO: hard coded gas in adminObj
+      return instance.calcNewBalances(Srv.adminObj)
     }).then(function (result) {
       console.log('updateStakedBalances:then')
       console.dir(result)

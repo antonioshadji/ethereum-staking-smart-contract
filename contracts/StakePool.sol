@@ -7,17 +7,17 @@ import './StakeContract.sol';
 contract StakePool {
   using SafeMath for uint;
 
-  /** @dev set owner
+  /** @dev set admin
     */
-  address private owner;
-  /** @dev owners profits
+  address private admin;
+  /** @dev admins profits
     */
-  uint private ownersBalance;
+  uint private adminsBalance;
 
-  /** @dev owners payout percentage in uint
+  /** @dev admins payout percentage in uint
     * 1 = 1%
     */
-  uint8 private ownersPayout = 1;
+  uint8 private adminsPayout = 1;
 
   /** @dev address of staking contract
     */
@@ -31,10 +31,6 @@ contract StakePool {
     */
   uint totalStaked;
 
-  /** @dev track total deposited
-    */
-  uint totalDeposited;
-
   /** @dev track balances of ether deposited to contract
     */
   mapping(address => uint) private depositedBalances;
@@ -42,13 +38,6 @@ contract StakePool {
   /** @dev track balances of ether staked to contract
     */
   mapping(address => uint) private stakedBalances;
-
-  /** @dev track block.number when ether was staked
-    */
-  mapping(address => uint) private blockStaked;
-  /** @dev track block.number when ether was unstaked
-    */
-  mapping(address => uint) private blockUnstaked;
 
   /** @dev track user request to enter next staking period
     */
@@ -67,11 +56,12 @@ contract StakePool {
   /** @dev contract constructor
     */
   constructor(address _stakeContract) public {
-    owner = msg.sender;
+    admin = msg.sender;
     stakeContract = _stakeContract;
+    // TODO: instantiate contract by address than importing staking contract
     sc = StakeContract(stakeContract);
-    // set owner to users[0] because unknown user will return 0 from userIndex
-    users.push(owner);
+    // set admin to users[0] because unknown user will return 0 from userIndex
+    users.push(admin);
   }
 
   /** @dev payable fallback
@@ -89,13 +79,13 @@ contract StakePool {
     uint blockNumber
   );
 
-  /** @dev restrict function to only work when called by owner
+  /** @dev restrict function to only work when called by admin
     * TODO: replace with zeppelin Ownable?
     */
-  modifier onlyOwner() {
+  modifier onlyAdmin() {
     require(
-      msg.sender == owner,
-      "only owner can call this function"
+      msg.sender == admin,
+      "only admin can call this function"
     );
     _;
   }
@@ -115,7 +105,7 @@ contract StakePool {
     */
   function removeUser(address _user) internal {
     uint index = userIndex[_user];
-    // never remove owner from 0 slot in user array
+    // never remove admin from 0 slot in user array
     if (index == 0) return;
     // user is not last user
     if (index < users.length.sub(1)) {
@@ -130,7 +120,7 @@ contract StakePool {
   /** @dev add a user to users array
     */
   function addUser(address _user) internal {
-    if (_user == owner ) return;
+    if (_user == admin ) return;
     if (isExistingUser(_user)) return;
     users.push(_user);
     // new user is currently last in users array
@@ -141,30 +131,24 @@ contract StakePool {
 
   /** @dev set staking contract address
     */
-  function setStakeContract(address _staker) public onlyOwner {
+  function setStakeContract(address _staker) public onlyAdmin {
    stakeContract = _staker;
    sc = StakeContract(stakeContract);
   }
 
-  /** @dev withdraw profits to owner account
+  /** @dev withdraw profits to admin account
     */
-  function getOwnersProfits() public onlyOwner {
-    require(ownersBalance > 0);
-    uint valueWithdrawn = ownersBalance;
-    ownersBalance = 0;
-    owner.transfer(valueWithdrawn);
+  function getAdminsProfits() public onlyAdmin {
+    require(adminsBalance > 0);
+    uint valueWithdrawn = adminsBalance;
+    adminsBalance = 0;
+    admin.transfer(valueWithdrawn);
     emit NotifyProfitWithdrawal(valueWithdrawn);
   }
 
-  /** @dev notify of owner profit withdraw
+  /** @dev notify of admin profit withdraw
     */
   event NotifyProfitWithdrawal(uint valueWithdrawn);
-
-  /** @dev owner only may retreive undistributedFunds value
-    */
-  function getUndistributedFundsValue() public view onlyOwner returns (uint) {
-    return address(this).balance.sub(ownersBalance).sub(totalDeposited);
-  }
 
   /** @dev trigger notification of deposits
     */
