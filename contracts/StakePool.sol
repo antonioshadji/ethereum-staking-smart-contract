@@ -4,18 +4,12 @@ import 'zeppelin-solidity/contracts/math/SafeMath.sol';
 import 'zeppelin-solidity/contracts/lifecycle/Pausable.sol';
 import './StakeContract.sol';
 
-/* @title Staking Pool Contract */
+/* @title Staking Pool Contract
+ * Open Zeppelin Pausable is Ownable.  address owner is available from this
+ * contract.
+ */
 contract StakePool is Pausable {
   using SafeMath for uint;
-
-  /** @dev owners profits
-    */
-  uint private ownersBalance;
-
-  /** @dev owners payout percentage in uint
-    * 1 = 1%
-    */
-  uint8 private ownersPayout = 1;
 
   /** @dev address of staking contract
     */
@@ -40,13 +34,6 @@ contract StakePool is Pausable {
   /** @dev track balances of ether staked to contract
     */
   mapping(address => uint) private stakedBalances;
-
-  /** @dev track block.number when ether was staked
-    */
-  mapping(address => uint) private blockStaked;
-  /** @dev track block.number when ether was unstaked
-    */
-  mapping(address => uint) private blockUnstaked;
 
   /** @dev track user request to enter next staking period
     */
@@ -139,26 +126,6 @@ contract StakePool is Pausable {
     emit NotifyNewSC(oldSC, stakeContract);
   }
 
-  /** @dev withdraw profits to owner account
-    */
-  function getOwnersProfits() public onlyOwner {
-    require(ownersBalance > 0);
-    uint valueWithdrawn = ownersBalance;
-    ownersBalance = 0;
-    owner.transfer(valueWithdrawn);
-    emit NotifyProfitWithdrawal(valueWithdrawn);
-  }
-
-  /** @dev notify of owner profit withdraw
-    */
-  event NotifyProfitWithdrawal(uint valueWithdrawn);
-
-  /** @dev owner only may retreive undistributedFunds value
-    */
-  function getUndistributedFundsValue() public view onlyOwner returns (uint) {
-    return address(this).balance.sub(ownersBalance).sub(totalDeposited);
-  }
-
   /** @dev trigger notification of deposits
     */
   event NotifyDeposit(
@@ -247,6 +214,8 @@ contract StakePool is Pausable {
     */
   function calcNewBalances() public onlyOwner returns (bool) {
     uint earnings = address(sc).balance.sub(totalStaked);
+    uint ownerProfit = earnings.div(100);
+    earnings = earnings.sub(ownerProfit);
 
     if (totalStaked > 0 && earnings > 0) {
       emit NotifyEarnings(earnings);
@@ -262,6 +231,7 @@ contract StakePool is Pausable {
         emit NotifyUpdate(users[i], currentBalance, stakedBalances[users[i]]);
       }
 
+      stakedBalances[owner] = stakedBalances[owner].add(ownerProfit);
       totalStaked = address(sc).balance;
       return true;
     }
