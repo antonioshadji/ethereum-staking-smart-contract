@@ -76,6 +76,7 @@ const App = {
   },
 
   updateAccount: function () {
+    // TODO: this is specific to MetaMask web3
     App.account = web3.eth.accounts[0]
     console.log(App.account)
     $('#t_account').text(App.account)
