@@ -55,6 +55,7 @@ const Srv = {
     }
 
     Srv.testSendEthertoStakeContract()
+    Srv.updateStakedBalances()
   },
 
   stopTimerNow: function () {
