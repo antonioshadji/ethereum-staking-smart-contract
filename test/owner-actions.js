@@ -42,13 +42,15 @@ contract(`Stakepool owner access: ${fn}`, function (accounts) {
           value: web3.toWei(1, 'ether')
         }
       )
-    }).then(function (trxObj) {
-      assert.exists(trxObj)
+    }).then(function (trxHash) {
+      assert.exists(trxHash)
+    }).then(function () {
+      log.write('then2')
+      assert.equal(web3.toWei(1, 'ether'), web3.eth.getBalance(pool.address))
     })
   })
 
   it.skip('should allow owner to withdraw profits', function () {
-    // TODO: owners profit must be greater than 0 before this will succeed
     return StakePool.deployed().then(function (instance) {
       // getProfits returns transactionObject
       // return { trx: instance.getProfits({from: accounts[0]}), i: instance }
@@ -75,6 +77,15 @@ contract(`Stakepool owner access: ${fn}`, function (accounts) {
       .then(function (a) {
         assert.equal(a, stak.address)
       })
+  })
+
+  it(`should be able to set stake address`, function () {
+    return StakePool.deployed().then(function (instance) {
+      return instance.setStakeContract(stak.address)
+    }).then(function (result) {
+      log.write(JSON.stringify(result, null, 2) + '\n')
+      assert.equal(result.logs[0].event, 'NotifyNewSC')
+    })
   })
 
   after('finished', function () {

@@ -1,15 +1,13 @@
 pragma solidity ^0.4.24;
 
 import 'zeppelin-solidity/contracts/math/SafeMath.sol';
+import 'zeppelin-solidity/contracts/lifecycle/Pausable.sol';
 import './StakeContract.sol';
 
 /* @title Staking Pool Contract */
-contract StakePool {
+contract StakePool is Pausable {
   using SafeMath for uint;
 
-  /** @dev set owner
-    */
-  address private owner;
   /** @dev owners profits
     */
   uint private ownersBalance;
@@ -67,7 +65,7 @@ contract StakePool {
   /** @dev contract constructor
     */
   constructor(address _stakeContract) public {
-    owner = msg.sender;
+    // owner = msg.sender;
     stakeContract = _stakeContract;
     sc = StakeContract(stakeContract);
     // set owner to users[0] because unknown user will return 0 from userIndex
@@ -88,17 +86,6 @@ contract StakePool {
     uint value,
     uint blockNumber
   );
-
-  /** @dev restrict function to only work when called by owner
-    * TODO: replace with zeppelin Ownable?
-    */
-  modifier onlyOwner() {
-    require(
-      msg.sender == owner,
-      "only owner can call this function"
-    );
-    _;
-  }
 
   /************************ USER MANAGEMENT **********************************/
   /* TODO: create Library?? */
@@ -139,11 +126,17 @@ contract StakePool {
   /************************ USER MANAGEMENT **********************************/
 
 
+  /** @dev notify that StakeContract address has been changed
+    */
+  event NotifyNewSC(address oldSC, address newSC);
+
   /** @dev set staking contract address
     */
   function setStakeContract(address _staker) public onlyOwner {
-   stakeContract = _staker;
-   sc = StakeContract(stakeContract);
+    address oldSC = stakeContract;
+    stakeContract = _staker;
+    sc = StakeContract(stakeContract);
+    emit NotifyNewSC(oldSC, stakeContract);
   }
 
   /** @dev withdraw profits to owner account
@@ -175,7 +168,7 @@ contract StakePool {
 
   /** @dev deposit funds to the contract
     */
-  function deposit() public payable {
+  function deposit() public payable whenNotPaused {
     addUser(msg.sender);
     depositedBalances[msg.sender] = depositedBalances[msg.sender].add(msg.value);
     emit NotifyDeposit(msg.sender, msg.value, depositedBalances[msg.sender]);
@@ -192,7 +185,7 @@ contract StakePool {
   /** @dev stake funds to stakeContract
     * http://solidity.readthedocs.io/en/latest/control-structures.html#external-function-calls
     */
-  function stake() public {
+  function stake() public onlyOwner {
     // * update mappings
     // * send total balance to stakeContract
     uint toStake;
@@ -220,7 +213,7 @@ contract StakePool {
   /** @dev unstake funds from stakeContract
     *
     */
-  function unstake() public {
+  function unstake() public onlyOwner {
     uint unStake;
     for (uint i = 0; i < users.length; i++) {
       uint amount = requestUnStake[users[i]];
@@ -252,7 +245,7 @@ contract StakePool {
 
   /** @dev calculated new stakedBalances
     */
-  function calcNewBalances() public returns (bool) {
+  function calcNewBalances() public onlyOwner returns (bool) {
     uint totalSC = address(sc).balance;
     uint earnings = totalSC.sub(totalStaked);
     emit NotifyEarnings(earnings);
@@ -289,7 +282,7 @@ contract StakePool {
     * TODO: this must be a request for withdrawal as un-staking takes time
     * not payable, not receiving funds
     */
-  function withdraw(uint wdValue) public {
+  function withdraw(uint wdValue) public whenNotPaused {
     require(wdValue > 0);
     require(depositedBalances[msg.sender] >= wdValue);
     uint startBalance = depositedBalances[msg.sender];
@@ -344,7 +337,7 @@ contract StakePool {
 
   /** @dev user can request to enter next staking period
     */
-  function requestNextStakingPeriod() public {
+  function requestNextStakingPeriod() public whenNotPaused {
     require(depositedBalances[msg.sender] > 0);
     uint amount = depositedBalances[msg.sender];
     depositedBalances[msg.sender] = 0;
