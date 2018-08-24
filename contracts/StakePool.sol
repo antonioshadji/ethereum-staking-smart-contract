@@ -11,15 +11,15 @@ contract StakePool is Pausable {
 
   /** @dev address of staking contract
     * this variable is set at construction, and can be changed only by owner.*/
-  address public stakeContract;
+  address private stakeContract;
   /** @dev staking contract object to interact with staking mechanism.
     * this is a mock contract.  */
-  StakeContract sc;
+  StakeContract private sc;
 
   /** @dev track total staked amount */
-  uint totalStaked;
+  uint private totalStaked;
   /** @dev track total deposited to pool */
-  uint totalDeposited;
+  uint private totalDeposited;
 
   /** @dev track balances of ether deposited to pool */
   mapping(address => uint) private depositedBalances;
@@ -32,7 +32,7 @@ contract StakePool is Pausable {
 
   /** @dev track users
     * users must be tracked in this array because mapping is not iterable */
-  address[] users;
+  address[] private users;
   /** @dev track index by address added to users */
   mapping(address => uint) private userIndex;
 
@@ -106,7 +106,7 @@ contract StakePool is Pausable {
     * @param _user address of user to test if in list
     * @return true if user is on record, otherwise false
     */
-  function isExistingUser(address _user) public view returns (bool) {
+  function isExistingUser(address _user) private view returns (bool) {
     if ( userIndex[_user] == 0) {
       return false;
     }
@@ -116,7 +116,7 @@ contract StakePool is Pausable {
   /** @dev remove a user from users array
     * @param _user address of user to remove from the list
     */
-  function removeUser(address _user) internal {
+  function removeUser(address _user) private {
     if (_user == owner ) return;
     uint index = userIndex[_user];
     // user is not last user
@@ -132,7 +132,7 @@ contract StakePool is Pausable {
   /** @dev add a user to users array
     * @param _user address of user to add to the list
     */
-  function addUser(address _user) internal {
+  function addUser(address _user) private {
     if (_user == owner ) return;
     if (isExistingUser(_user)) return;
     users.push(_user);
@@ -249,7 +249,7 @@ contract StakePool is Pausable {
     * pool.  Remove them from user list.
     * @param _user address of user to check
     */
-  function checkIfUserIsLeaving(address _user) internal {
+  function checkIfUserIsLeaving(address _user) private {
     if (depositedBalances[_user] == 0 && stakedBalances[_user] == 0) {
       removeUser(_user);
     }
