@@ -86,6 +86,7 @@ contract StakePool is Pausable {
     * @param _stakeContract the address of the staking contract/mechanism
     */
   constructor(address _stakeContract) public {
+    require(_stakeContract != address(0));
     stakeContract = _stakeContract;
     sc = StakeContract(stakeContract);
     // set owner to users[0] because unknown user will return 0 from userIndex
@@ -143,11 +144,12 @@ contract StakePool is Pausable {
   /************************ USER MANAGEMENT **********************************/
 
   /** @dev set staking contract address
-    * @param _staker new address to change staking contract / mechanism
+    * @param _stakeContract new address to change staking contract / mechanism
     */
-  function setStakeContract(address _staker) public onlyOwner {
+  function setStakeContract(address _stakeContract) public onlyOwner {
+    require(_stakeContract != address(0));
     address oldSC = stakeContract;
-    stakeContract = _staker;
+    stakeContract = _stakeContract;
     sc = StakeContract(stakeContract);
     emit NotifyNewSC(oldSC, stakeContract);
   }
