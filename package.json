@@ -7,9 +7,9 @@
     "test": "test"
   },
   "scripts": {
-    "test": "mocha",
+    "test": "truffle test",
     "migrate": "truffle migrate --reset; cp ./build/contracts/Stake*.json ./src/js/.",
-    "server": "./node_modules/light-server/bin/light-server -s src/ -b 127.0.0.1"
+    "server": "./node_modules/local-web-server/bin/cli.js -d src/"
   },
   "keywords": [
     "ethereum",
@@ -20,7 +20,7 @@
   "devDependencies": {
     "chai": "4.1.2",
     "ganache-cli": "6.1.0-beta.4",
-    "light-server": "2.5.1",
+    "local-web-server": "2.6.0",
     "mocha": "5.2.0",
     "webpack": "4.16.3"
   },
