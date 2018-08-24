@@ -69,9 +69,10 @@ contract(`User StakePool interactionions : ${fn}`, function (accounts) {
 
     it(`should now have balance of 1 ether for account:${index + 1}`, function () {
       return StakePool.deployed().then(function (instance) {
-        return instance.getBalance({from: test})
-      }).then(function (balance) {
-        assert.equal(balance.valueOf(), web3.toWei(1, 'ether'),
+        return instance.getState({from: test})
+      }).then(function (stateArr) {
+        // state array [0] is deposited balance for user
+        assert.equal(stateArr[0].valueOf(), web3.toWei(1, 'ether'),
           'account balance is not 1 ether')
       })
     })
@@ -103,13 +104,15 @@ contract(`User StakePool interactionions : ${fn}`, function (accounts) {
     })
 
     it(`should show a requested stake balance for account:${index + 1}`, function () {
-      return pool.getStakeRequestBalance({from: test}).then(function (value) {
-        assert.equal(value, web3.toWei(1, 'ether'), 'request not recorded')
+      return pool.getState({from: test}).then(function (stateArr) {
+        // stateArr[1] is requested stake balance
+        assert.equal(stateArr[1], web3.toWei(1, 'ether'), 'request not recorded')
       })
     })
     it(`should show a deposit balance of zero account:${index + 1}`, function () {
-      return pool.getBalance({from: test}).then(function (value) {
-        assert.equal(value, web3.toWei(0, 'ether'), 'deposit not adjusted')
+      return pool.getState({from: test}).then(function (stateArr) {
+        // state array [0] is deposited balance for user
+        assert.equal(stateArr[0], web3.toWei(0, 'ether'), 'deposit not adjusted')
       })
     })
   })
@@ -132,9 +135,10 @@ contract(`User StakePool interactionions : ${fn}`, function (accounts) {
   tests.forEach(function (test, index) {
     it(`should now have staked balance of 1 ether for account:${index + 1}`, function () {
       return StakePool.deployed().then(function (instance) {
-        return instance.getStakedBalance({from: test})
-      }).then(function (balance) {
-        assert.equal(balance, web3.toWei(1, 'ether'), 'account balance check failed')
+        return instance.getState({from: test})
+      }).then(function (stateArr) {
+        // stateArr[3] is staked balance
+        assert.equal(stateArr[3], web3.toWei(1, 'ether'), 'account balance check failed')
       })
     })
   })
