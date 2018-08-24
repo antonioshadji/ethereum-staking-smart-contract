@@ -5,78 +5,106 @@ import 'zeppelin-solidity/contracts/lifecycle/Pausable.sol';
 import './StakeContract.sol';
 
 /* @title Staking Pool Contract
- * Open Zeppelin Pausable is Ownable.  address owner is available from this
- * contract.
- */
+ * Open Zeppelin Pausable is Ownable.  contains address owner */
 contract StakePool is Pausable {
   using SafeMath for uint;
 
   /** @dev address of staking contract
-    */
+    * this variable is set at construction, and can be changed only by owner.*/
   address public stakeContract;
-  /** @dev staking contract object to interact with existing contract at known
-    * location
-    */
+  /** @dev staking contract object to interact with staking mechanism.
+    * this is a mock contract.  */
   StakeContract sc;
 
-  /** @dev track total staked amount
-    */
+  /** @dev track total staked amount */
   uint totalStaked;
-
-  /** @dev track total deposited
-    */
+  /** @dev track total deposited to pool */
   uint totalDeposited;
 
-  /** @dev track balances of ether deposited to contract
-    */
+  /** @dev track balances of ether deposited to pool */
   mapping(address => uint) private depositedBalances;
-
-  /** @dev track balances of ether staked to contract
-    */
+  /** @dev track balances of ether staked */
   mapping(address => uint) private stakedBalances;
-
-  /** @dev track user request to enter next staking period
-    */
+  /** @dev track user request to enter next staking period */
   mapping(address => uint) private requestStake;
-  /** @dev track user request to exit current staking period
-    */
+  /** @dev track user request to exit current staking period */
   mapping(address => uint) private requestUnStake;
 
   /** @dev track users
-    */
+    * users must be tracked in this array because mapping is not iterable */
   address[] users;
-  /** @dev track index by address added to users
-    */
+  /** @dev track index by address added to users */
   mapping(address => uint) private userIndex;
 
+  /** @dev notify when funds received from staking contract
+    * @param sender       msg.sender for the transaction
+    * @param amount       msg.value for the transaction
+    * @param blockNumber  block.number of the transaction for record keeping
+   */
+  event NotifyFallback(address sender, uint amount, uint blockNumber);
+
+  /** @dev notify that StakeContract address has been changed 
+    * @param oldSC old address of the staking contract
+    * @param newSC new address of the staking contract
+   */
+  event NotifyNewSC(address oldSC, address newSC);
+
+  /** @dev trigger notification of deposits
+    * @param sender  msg.sender for the transaction
+    * @param amount  msg.value for the transaction
+    * @param balance the users balance including this deposit
+   */
+  event NotifyDeposit(address sender, uint amount, uint balance);
+
+  /** @dev trigger notification of staked amount
+    * @param sender       msg.sender for the transaction
+    * @param amount       msg.value for the transaction
+    * @param blockNumber  block.number of the transaction for record keeping
+    */
+  event NotifyStaked(address sender, uint amount, uint blockNumber);
+
+  /** @dev trigger notification of change in users staked balances
+    * @param user            address of user
+    * @param previousBalance users previous staked balance
+    * @param newStakeBalence users new staked balance
+    */
+  event NotifyUpdate(address user, uint previousBalance, uint newStakeBalence);
+
+  /** @dev trigger notification of withdrawal
+    * @param sender   address of msg.sender
+    * @param startBal users starting balance
+    * @param finalBal users final balance after withdrawal
+    * @param request  users requested withdraw amount
+    */
+  event NotifyWithdrawal(
+    address sender,
+    uint startBal,
+    uint finalBal,
+    uint request);
+
   /** @dev contract constructor
+    * @param _stakeContract the address of the staking contract/mechanism
     */
   constructor(address _stakeContract) public {
-    // owner = msg.sender;
     stakeContract = _stakeContract;
     sc = StakeContract(stakeContract);
     // set owner to users[0] because unknown user will return 0 from userIndex
+    // this also allows owners to withdraw their own earnings using same
+    // functions as regular users
     users.push(owner);
   }
 
   /** @dev payable fallback
-    * it is assumed that only funds received will be from stakeContract
-    */
+    * it is assumed that only funds received will be from stakeContract */
   function () external payable {
-    emit FallBackSP(msg.sender, msg.value, block.number);
+    emit NotifyFallback(msg.sender, msg.value, block.number);
   }
 
-  /** @dev notify when funds received at contract
-    */
-  event FallBackSP(
-    address sender,
-    uint value,
-    uint blockNumber
-  );
-
   /************************ USER MANAGEMENT **********************************/
-  /* TODO: create Library?? */
+
   /** @dev test if user is in current user list
+    * @param _user address of user to test if in list
+    * @return true if user is on record, otherwise false
     */
   function isExistingUser(address _user) public view returns (bool) {
     if ( userIndex[_user] == 0) {
@@ -86,11 +114,11 @@ contract StakePool is Pausable {
   }
 
   /** @dev remove a user from users array
+    * @param _user address of user to remove from the list
     */
   function removeUser(address _user) internal {
+    if (_user == owner ) return;
     uint index = userIndex[_user];
-    // never remove owner from 0 slot in user array
-    if (index == 0) return;
     // user is not last user
     if (index < users.length.sub(1)) {
       address lastUser = users[users.length.sub(1)];
@@ -102,6 +130,7 @@ contract StakePool is Pausable {
   }
 
   /** @dev add a user to users array
+    * @param _user address of user to add to the list
     */
   function addUser(address _user) internal {
     if (_user == owner ) return;
@@ -110,14 +139,11 @@ contract StakePool is Pausable {
     // new user is currently last in users array
     userIndex[_user] = users.length.sub(1);
   }
+
   /************************ USER MANAGEMENT **********************************/
 
-
-  /** @dev notify that StakeContract address has been changed
-    */
-  event NotifyNewSC(address oldSC, address newSC);
-
   /** @dev set staking contract address
+    * @param _staker new address to change staking contract / mechanism
     */
   function setStakeContract(address _staker) public onlyOwner {
     address oldSC = stakeContract;
@@ -126,31 +152,7 @@ contract StakePool is Pausable {
     emit NotifyNewSC(oldSC, stakeContract);
   }
 
-  /** @dev trigger notification of deposits
-    */
-  event NotifyDeposit(
-    address sender,
-    uint amount,
-    uint balance);
-
-  /** @dev deposit funds to the contract
-    */
-  function deposit() public payable whenNotPaused {
-    addUser(msg.sender);
-    depositedBalances[msg.sender] = depositedBalances[msg.sender].add(msg.value);
-    emit NotifyDeposit(msg.sender, msg.value, depositedBalances[msg.sender]);
-  }
-
-  /** @dev trigger notification of staked amount
-    */
-  event NotifyStaked(
-    address sender,
-    uint amount,
-    uint blockNum
-  );
-
   /** @dev stake funds to stakeContract
-    * http://solidity.readthedocs.io/en/latest/control-structures.html#external-function-calls
     */
   function stake() public onlyOwner {
     // * update mappings
@@ -166,19 +168,12 @@ contract StakePool is Pausable {
     // track total staked
     totalStaked = totalStaked.add(toStake);
 
-    // this is how to send ether with a call to an external contract
-    // sc.deposit.value(toStake)();
     address(sc).transfer(toStake);
 
-    emit NotifyStaked(
-      msg.sender,
-      toStake,
-      block.number
-    );
+    emit NotifyStaked(msg.sender, toStake, block.number);
   }
 
   /** @dev unstake funds from stakeContract
-    *
     */
   function unstake() public onlyOwner {
     uint unStake;
@@ -193,24 +188,13 @@ contract StakePool is Pausable {
     // track total staked
     totalStaked = totalStaked.sub(unStake);
 
-    // sc.withdraw(amount, msg.sender);
     sc.withdraw(unStake);
 
-    emit NotifyStaked(
-      msg.sender,
-      -unStake,
-      block.number
-    );
+    emit NotifyStaked(msg.sender, -unStake, block.number);
   }
 
-  event NotifyUpdate(
-    address user,
-    uint previousBalance,
-    uint newStakeBalence
-  );
-  event NotifyEarnings(uint earnings);
-
   /** @dev calculated new stakedBalances
+    * @return true if calc is successful, otherwise false
     */
   function calcNewBalances() public onlyOwner returns (bool) {
     uint earnings = address(sc).balance.sub(totalStaked);
@@ -218,46 +202,39 @@ contract StakePool is Pausable {
     earnings = earnings.sub(ownerProfit);
 
     if (totalStaked > 0 && earnings > 0) {
-      emit NotifyEarnings(earnings);
-
       for (uint i = 0; i < users.length; i++) {
         uint currentBalance = stakedBalances[users[i]];
-
         stakedBalances[users[i]] =
           currentBalance.add(
             earnings.mul(99).div(100).mul(currentBalance).div(totalStaked)
           );
-
         emit NotifyUpdate(users[i], currentBalance, stakedBalances[users[i]]);
       }
-
       stakedBalances[owner] = stakedBalances[owner].add(ownerProfit);
       totalStaked = address(sc).balance;
       return true;
     }
-
     return false;
   }
 
-  /** @dev trigger notification of withdrawal
+  /** @dev deposit funds to the contract
     */
-  event NotifyWithdrawal(
-    address sender,
-    uint startBal,
-    uint finalBal,
-    uint request);
+  function deposit() public payable whenNotPaused {
+    addUser(msg.sender);
+    depositedBalances[msg.sender] = depositedBalances[msg.sender].add(msg.value);
+    emit NotifyDeposit(msg.sender, msg.value, depositedBalances[msg.sender]);
+  }
 
   /** @dev withdrawal funds out of pool
     * @param wdValue amount to withdraw
-    * TODO: this must be a request for withdrawal as un-staking takes time
-    * not payable, not receiving funds
     */
   function withdraw(uint wdValue) public whenNotPaused {
     require(wdValue > 0);
     require(depositedBalances[msg.sender] >= wdValue);
     uint startBalance = depositedBalances[msg.sender];
-    // open zeppelin sub function to ensure no overflow
     depositedBalances[msg.sender] = depositedBalances[msg.sender].sub(wdValue);
+    checkIfUserIsLeaving(msg.sender);
+
     msg.sender.transfer(wdValue);
 
     emit NotifyWithdrawal(
@@ -268,8 +245,37 @@ contract StakePool is Pausable {
     );
   }
 
-  /** @dev retreive current state of users funds
+  /** @dev if user has no deposit and no staked funds they are leaving the 
+    * pool.  Remove them from user list.
+    * @param _user address of user to check
     */
+  function checkIfUserIsLeaving(address _user) internal {
+    if (depositedBalances[_user] == 0 && stakedBalances[_user] == 0) {
+      removeUser(_user);
+    }
+  }
+
+  /** @dev user can request to enter next staking period */
+  function requestNextStakingPeriod() public whenNotPaused {
+    require(depositedBalances[msg.sender] > 0);
+    uint amount = depositedBalances[msg.sender];
+    depositedBalances[msg.sender] = 0;
+    requestStake[msg.sender] = requestStake[msg.sender].add(amount);
+    emit NotifyStaked(msg.sender, requestStake[msg.sender], block.number);
+  }
+
+  /** @dev user can request to exit at end of current staking period
+    * @param amount requested amount to withdraw from staking contract
+   */
+  function requestExitAtEndOfCurrentStakingPeriod(uint amount) public {
+    require(stakedBalances[msg.sender] >= amount);
+    requestUnStake[msg.sender] = requestUnStake[msg.sender].add(amount);
+    emit NotifyStaked(msg.sender, requestUnStake[msg.sender], block.number);
+  }
+
+  /** @dev retreive current state of users funds
+    * @return array of values describing the current state of user
+   */
   function getState() public view returns (uint[]) {
     uint[] memory state = new uint[](4);
     state[0] = depositedBalances[msg.sender];
@@ -278,31 +284,4 @@ contract StakePool is Pausable {
     state[3] = stakedBalances[msg.sender];
     return state;
   }
-
-  /** @dev user can request to enter next staking period
-    */
-  function requestNextStakingPeriod() public whenNotPaused {
-    require(depositedBalances[msg.sender] > 0);
-    uint amount = depositedBalances[msg.sender];
-    depositedBalances[msg.sender] = 0;
-    // TODO: add test for adding additional funds to stake pool
-    requestStake[msg.sender] = requestStake[msg.sender].add(amount);
-    emit NotifyStaked(msg.sender, requestStake[msg.sender], block.number);
-  }
-
-  /** @dev user can request to exit at end of current staking period
-    */
-  function requestExitAtEndOfCurrentStakingPeriod(uint amount) public {
-    require(stakedBalances[msg.sender] >= amount);
-    requestUnStake[msg.sender] = requestUnStake[msg.sender].add(amount);
-    emit NotifyStaked(msg.sender, requestUnStake[msg.sender], block.number);
-  }
 }
-
-  /* example comments for functions */
-    /** @dev Calculates a rectangle's surface and perimeter.
-      * @param w Width of the rectangle.
-      * @param h Height of the rectangle.
-      * @return s The calculated surface.
-      * @return p The calculated perimeter.
-      */

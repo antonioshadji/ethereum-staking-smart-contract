@@ -184,7 +184,7 @@ contract(`User StakePool interactionions : ${fn}`, function (accounts) {
       assert.exists(trxObj.logs)
       trxObj.logs.forEach(function (e) {
         log.write(e.event + '\n')
-        assert.oneOf(e.event, ['NotifyWithdrawal', 'NotifyStaked', 'FallBackSP'])
+        assert.oneOf(e.event, ['NotifyWithdrawal', 'NotifyStaked', 'NotifyFallback'])
       })
     })
   })
