@@ -76,12 +76,6 @@ contract(`User StakePool interactionions : ${fn}`, function (accounts) {
           'account balance is not 1 ether')
       })
     })
-
-    it(`should show account:${index + 1} as a user`, function () {
-      return pool.isExistingUser(test).then(function (bool) {
-        assert.isOk(bool)
-      })
-    })
   })
 
   it('should now have balance of 2 ether in StakePool', function () {

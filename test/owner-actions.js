@@ -67,18 +67,6 @@ contract(`Stakepool owner access: ${fn}`, function (accounts) {
     })
   })
 
-  it(`should be able to check stake address with pool getter`, function () {
-    // stakeContract is name of public global variable in StakePool contract
-    // the compiler created getter, returns a Promise
-    return pool.stakeContract()
-      .then(function (val) {
-        return val
-      })
-      .then(function (a) {
-        assert.equal(a, stak.address)
-      })
-  })
-
   it(`should be able to set stake address`, function () {
     return StakePool.deployed().then(function (instance) {
       return instance.setStakeContract(stak.address)
