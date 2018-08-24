@@ -126,16 +126,17 @@ const App = {
       if (err) console.error(err)
       console.log(`gas price:${price.toString(10)}`)
     })
+    // https://github.com/ethereum/wiki/wiki/JavaScript-API#web3ethestimategas
     // TODO: how can I add a verification message to Metamask?
     App.contracts.StakePool.deployed().then(async function (instance) {
       let result = {}
+      result.instance = instance
       await instance.withdraw.estimateGas(
         web3.toWei(value, 'ether'),
         { from: App.account }
       ).then(function (resolve, reject) {
         result.estimate = resolve
       })
-      result.instance = instance
       return result
     }).then(function (obj) {
       console.log(`gas estimate: ${obj.estimate}`)
@@ -145,7 +146,7 @@ const App = {
         web3.toWei(value, 'ether'),
         {
           from: App.account,
-          gas: obj.estimate + 20000
+          gas: obj.estimate + 100000
         }
       )
     }).then(function (result) {
