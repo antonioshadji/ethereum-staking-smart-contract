@@ -11,6 +11,8 @@ contract TestSafeMath {
 
   // https://truffleframework.com/docs/truffle/testing/writing-tests-in-solidity#testing-ether-transactions
   uint public initialBalance = 6 ether;
+
+  // this test is a learning excercise to verify how initialBalance works in practice
   function testSendEtherInitialize() public {
    // StakePool sp = StakePool(DeployedAddresses.StakePool());
    //  StakeContract sc = StakeContract(DeployedAddresses.StakeContract());
@@ -27,6 +29,7 @@ contract TestSafeMath {
     Assert.balanceEqual(DeployedAddresses.StakePool(), 3 ether, 'SP did not receive eth');
   }
 
+  // this test is learning excercise to verify how SafeMath library functions
   function testChainedAdd() public {
     // test if using SafeMath for uint modifies original values or only returns
     uint var1 = 2;
@@ -37,6 +40,7 @@ contract TestSafeMath {
     Assert.equal(var2, 3, 'var2 is not modified');
   }
 
+  // this test is learning excercise to verify how SafeMath library functions
   function testChainedAll() public {
     uint var1 = 2;
     uint var2 = 3;
@@ -45,18 +49,21 @@ contract TestSafeMath {
     Assert.equal(var1.mul(var2).mul(var3).div(var4), 8, 'left to right');
   }
 
+  // this test is learning excercise to verify how SafeMath library functions
   function testOrderSub() public {
     uint var1 = 100;
     uint var2 = 20;
     Assert.equal(SafeMath.sub(var1, var2), 80, 'first - second');
   }
 
+  // this test is learning excercise to verify how SafeMath library functions
   function testOrderSubChain() public {
     uint var1 = 10;
     uint var2 = 20;
     Assert.equal(var2.sub(var1), 10, 'not expected');
   }
 
+  // this test is learning excercise to verify how SafeMath library functions
   function testMultipleSub() public {
     uint var0 = 99;
     uint var1 = 10;
@@ -64,12 +71,14 @@ contract TestSafeMath {
     Assert.equal(var0.sub(var1).sub(var2), 69, 'not expected');
   }
 
+  // this test is learning excercise to verify how SafeMath library functions
   function testFractions() public {
     uint var0 = 1;
     uint var1 = 2;
     Assert.equal(var0.div(var1), 0, 'not expected');
   }
 
+  // this test is learning excercise to verify how solidity handles decimals
   function testDecimals() public {
     uint a = 0.99 * 100;
     Assert.equal(a, 99, 'not expected');
@@ -77,6 +86,7 @@ contract TestSafeMath {
 
   // by default array in global scope is storage type
   uint[] numbers;
+  // this test is learning excercise to verify how solidity arrays operate
   function testArray() public {
     // push only works for storage arrays
     // (declared in global scope, or with modifier inside function )

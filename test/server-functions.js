@@ -16,9 +16,11 @@ const StakeContract = artifacts.require('StakeContract')
 const fn = p.basename(__filename)
 
 contract(`Stakepool owner access: ${fn}`, function (accounts) {
+  // set up global objects
   let pool = null
   let stak = null
   let log = null
+  // setup logging and contracts
   before('show contract addresses', function () {
     log = fs.createWriteStream(`./test/logs/${fn}.log`)
     log.write(`${(new Date()).toISOString()}\n`)
@@ -58,26 +60,9 @@ contract(`Stakepool owner access: ${fn}`, function (accounts) {
       )
     }).then(function (trxHash) {
       assert.exists(trxHash)
+      log.write(trxHash)
     }).then(function () {
-      log.write('then2')
       assert.equal(web3.toWei(2, 'ether'), web3.eth.getBalance(pool.address).valueOf())
-    })
-  })
-
-  it.skip('should allow owner to withdraw profits', function () {
-    return StakePool.deployed().then(function (instance) {
-      // getProfits returns transactionObject
-      // return { trx: instance.getProfits({from: accounts[0]}), i: instance }
-      return instance.getOwnersProfits({from: accounts[0]})
-    }).then(function (obj) {
-      // console.log(transactionObject.logs[0].args.previousBal.toNumber())
-      assert.property(obj, 'logs', 'return object contains logs property')
-      assert.isArray(obj.logs, 'logs array is available')
-      assert.isOk(obj.logs, 'logs array has at least one entry')
-      assert.isOk(obj.logs[0].args, 'logs contain args')
-      assert.isOk(obj.logs[0].args.valueWithdrawn, 'args contain valueWithdrawn')
-      let vw = obj.logs[0].args.valueWithdrawn.toNumber()
-      assert.equal(vw, 0, 'logs should confirm 0 balance')
     })
   })
 
@@ -86,6 +71,8 @@ contract(`Stakepool owner access: ${fn}`, function (accounts) {
       return instance.setStakeContract(stak.address)
     }).then(function (result) {
       log.write(JSON.stringify(result, null, 2) + '\n')
+      assert.exists(result.logs)
+      assert.isAtLeast(result.logs.length, 1)
       assert.equal(result.logs[0].event, 'NotifyNewSC')
     })
   })
@@ -111,6 +98,23 @@ contract(`Stakepool owner access: ${fn}`, function (accounts) {
       web3.toWei(2, 'ether'),
       'StakeContract account balance is not as expected'
     )
+  })
+
+  it.skip('should allow owner to withdraw profits', function () {
+    return StakePool.deployed().then(function (instance) {
+      // getProfits returns transactionObject
+      // return { trx: instance.getProfits({from: accounts[0]}), i: instance }
+      return instance.getOwnersProfits({from: accounts[0]})
+    }).then(function (obj) {
+      // console.log(transactionObject.logs[0].args.previousBal.toNumber())
+      assert.property(obj, 'logs', 'return object contains logs property')
+      assert.isArray(obj.logs, 'logs array is available')
+      assert.isOk(obj.logs, 'logs array has at least one entry')
+      assert.isOk(obj.logs[0].args, 'logs contain args')
+      assert.isOk(obj.logs[0].args.valueWithdrawn, 'args contain valueWithdrawn')
+      let vw = obj.logs[0].args.valueWithdrawn.toNumber()
+      assert.equal(vw, 0, 'logs should confirm 0 balance')
+    })
   })
 
   after('finished', function () {
