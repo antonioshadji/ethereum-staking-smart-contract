@@ -33,6 +33,20 @@ contract(`Stakepool owner access: ${fn}`, function (accounts) {
     })
   })
 
+  it(`should create logs when recieving ether without function call`, function () {
+    return pool.sendTransaction(
+      {
+        from: accounts[9],
+        value: web3.toWei(1, 'ether')
+      }
+    ).then(function (trxObj) {
+      assert.exists(trxObj)
+      log.write(JSON.stringify(trxObj, null, 2) + '\n')
+      assert.exists(trxObj.logs)
+      assert.isAtLeast(trxObj.logs.length, 1)
+    })
+  })
+
   it('should receive ether when sent to instance address', function () {
     return StakePool.deployed().then(function (instance) {
       return web3.eth.sendTransaction(
@@ -46,7 +60,7 @@ contract(`Stakepool owner access: ${fn}`, function (accounts) {
       assert.exists(trxHash)
     }).then(function () {
       log.write('then2')
-      assert.equal(web3.toWei(1, 'ether'), web3.eth.getBalance(pool.address))
+      assert.equal(web3.toWei(2, 'ether'), web3.eth.getBalance(pool.address).valueOf())
     })
   })
 
@@ -74,6 +88,29 @@ contract(`Stakepool owner access: ${fn}`, function (accounts) {
       log.write(JSON.stringify(result, null, 2) + '\n')
       assert.equal(result.logs[0].event, 'NotifyNewSC')
     })
+  })
+
+  it(`should be able to receive funds from StakeContract`, function () {
+    return pool.unstake().then(function (trxObj) {
+      assert.exists(trxObj)
+      log.write(JSON.stringify(trxObj, null, 2) + '\n')
+    })
+  })
+
+  it.skip(`should have a balance of 1 ether in StakePool`, function () {
+    assert.equal(
+      web3.eth.getBalance(pool.address).valueOf(),
+      web3.toWei(1, 'ether'),
+      'StakePool account balance is not as expected'
+    )
+  })
+
+  it.skip(`should have a balance of 2 ether in StakeContract`, function () {
+    assert.equal(
+      web3.eth.getBalance(stak.address).valueOf(),
+      web3.toWei(2, 'ether'),
+      'StakeContract account balance is not as expected'
+    )
   })
 
   after('finished', function () {

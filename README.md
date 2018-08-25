@@ -63,4 +63,10 @@ user's share = earnings * 99% * (users stake) / ( total stake)
 ### Automated Testing
 Automated tests can be run with `npm test` command.
 
-File ./test/full-workflow.js runs the contract through the full lifecycle of a user experience.  
+File [./test/full-workflow.js][1] runs the contract through the full lifecycle of a user experience.  
+
+
+
+
+
+[1]: https://github.com/AntoniosHadji/ethereum-staking-smart-contract/blob/master/test/full-workflow.js
