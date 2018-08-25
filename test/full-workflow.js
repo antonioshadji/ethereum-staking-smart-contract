@@ -103,6 +103,7 @@ contract(`User StakePool interactionions : ${fn}`, function (accounts) {
         assert.equal(stateArr[1], web3.toWei(1, 'ether'), 'request not recorded')
       })
     })
+
     it(`should show a deposit balance of zero account:${index + 1}`, function () {
       return pool.getState({from: test}).then(function (stateArr) {
         // state array [0] is deposited balance for user
