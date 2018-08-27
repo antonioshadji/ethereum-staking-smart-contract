@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "truffle test",
+    "test": "truffle test test/full-workflow.js",
     "migrate": "truffle migrate --reset; cp ./build/contracts/Stake*.json ./src/js/.",
     "server": "./node_modules/local-web-server/bin/cli.js -d src/"
   },

@@ -49,23 +49,6 @@ contract(`Stakepool owner access: ${fn}`, function (accounts) {
     })
   })
 
-  it('should receive ether when sent to instance address', function () {
-    return StakePool.deployed().then(function (instance) {
-      return web3.eth.sendTransaction(
-        {
-          from: accounts[9],
-          to: instance.address,
-          value: web3.toWei(1, 'ether')
-        }
-      )
-    }).then(function (trxHash) {
-      assert.exists(trxHash)
-      log.write(trxHash)
-    }).then(function () {
-      assert.equal(web3.toWei(2, 'ether'), web3.eth.getBalance(pool.address).valueOf())
-    })
-  })
-
   it(`should be able to set stake address`, function () {
     return StakePool.deployed().then(function (instance) {
       return instance.setStakeContract(stak.address)
@@ -77,33 +60,8 @@ contract(`Stakepool owner access: ${fn}`, function (accounts) {
     })
   })
 
-  it(`should be able to receive funds from StakeContract`, function () {
-    return pool.unstake().then(function (trxObj) {
-      assert.exists(trxObj)
-      log.write(JSON.stringify(trxObj, null, 2) + '\n')
-    })
-  })
-
-  it.skip(`should have a balance of 1 ether in StakePool`, function () {
-    assert.equal(
-      web3.eth.getBalance(pool.address).valueOf(),
-      web3.toWei(1, 'ether'),
-      'StakePool account balance is not as expected'
-    )
-  })
-
-  it.skip(`should have a balance of 2 ether in StakeContract`, function () {
-    assert.equal(
-      web3.eth.getBalance(stak.address).valueOf(),
-      web3.toWei(2, 'ether'),
-      'StakeContract account balance is not as expected'
-    )
-  })
-
   it.skip('should allow owner to withdraw profits', function () {
     return StakePool.deployed().then(function (instance) {
-      // getProfits returns transactionObject
-      // return { trx: instance.getProfits({from: accounts[0]}), i: instance }
       return instance.getOwnersProfits({from: accounts[0]})
     }).then(function (obj) {
       // console.log(transactionObject.logs[0].args.previousBal.toNumber())
