@@ -2,8 +2,7 @@
 
 See the [front end hosted on github][3] This will connect to an instance of Ganache running on localhost at port 8545.
 
-You can also see the front end via IPFS at:
-https://gateway.ipfs.io/ipfs/QmQanC6PBfZxshSMeViJpozNfdG1RUBEoKWocv6aVeq9w5/
+You can also see the front end via [IPFS](https://gateway.ipfs.io/ipfs/QmQanC6PBfZxshSMeViJpozNfdG1RUBEoKWocv6aVeq9w5/)
 
 Table of Contents:
 * [Overview](#overview)
