@@ -65,11 +65,35 @@ In this test setup, the application is running both the client side code and ser
 ### Automated Testing
 Automated tests can be run with `npm test` command.
 
-File [./test/full-workflow.js][1] runs the contract through the full lifecycle of a user experience.  
+File [./test/full-workflow.js][1] runs the contract through the full application lifecycle.  
+
+1. Verify that both StakePool and StakeContract are starting with 0 ether balance.  
+2. Verify that ether can be deposited by multiple users, including owner account (account[0]).  
+3. Verify that StakePool correctly recorded deposits for all users.  
+4. Compare that total ether balance for StakePool is equal to total deposits.  
+5. Verify that each user (including owner account) can request deposited ether to be staked  
+6. Verify that contract state shows correct accounting of ether as requested to be staked.  
+7. Verify that deposits are set to zero when balance is requested to be staked.  
+8. Verify that StakePool can send ether to StakeContract for staking.  
+9. Verify that staked balances are recorded correctly.  
+1. Verify that StakeContract contains all the ether in this test.  
+2. Verify that there is on ether left in StakePool.  
+3. Verify that StakePool can calculate a correct profit distribution.  This test takes multiple steps:  
+    1. First deposit ether from external account to simulate earnings being created in StakeContract. (mock staking contract/wallet)
+    2. Verify that earnings are reported via logs.
+    3. Verify that owner's profits are calculated correctly.
+    4. Verify that earnings are distributed correctly.  
+4. Verify that all accounts can request ether be unstaked.  
+5. Verify that all ether is unstaked.  
+6. Verify that StakeContract is now empty.  
+7. Verify that StakePool contains all expected ether.  
+8. Verify that ether can not be withdrawn from by an account who has not deposited ether.
+8. Verify that user can not withdraw more than their own balance of ether.
+9. Verify that each account can withdraw it's ether balance (including earnings).
+0. Verify that after full withdraw, StakePool is empty of ether.  
 
 
 
-File [./test/server-functions.js][2] runs the contract through the full lifecycle of owner actions.  
 
 
 

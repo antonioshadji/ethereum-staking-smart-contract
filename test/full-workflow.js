@@ -258,6 +258,18 @@ contract(`User StakePool interactionions : ${fn}`, function (accounts) {
     assert.fail('no error detected')
   })
 
+  it('should NOT be able to return greater ether balance than account owns. (fails as expected)', async function () {
+    try {
+      await StakePool.deployed().then(function (instance) {
+        return instance.withdraw(web3.toWei(2, 'ether'), {from: accounts[1]})
+      })
+    } catch (err) {
+      assert.exists(err)
+      return
+    }
+    assert.fail('no error detected')
+  })
+
   tests.forEach(function (test, index) {
     let values = []
     it(`should be able to return ether to correct account: ${index}`, function () {
