@@ -132,11 +132,7 @@ const Srv = {
     }).then(function (result) {
       console.log('updateStakedBalances:then')
       console.dir(result)
-      if (result) {
-        Srv.getState()
-      } else {
-        console.error(`no state update received`)
-      }
+      Srv.getState()
     }).catch(function (err) {
       console.error(`calculation error: ${err.message}`)
     })

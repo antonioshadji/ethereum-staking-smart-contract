@@ -58,9 +58,8 @@ contract StakePool is Pausable {
   /** @dev trigger notification of staked amount
     * @param sender       msg.sender for the transaction
     * @param amount       msg.value for the transaction
-    * @param blockNumber  block.number of the transaction for record keeping
     */
-  event NotifyStaked(address sender, uint amount, uint blockNumber);
+  event NotifyStaked(address sender, uint amount);
 
   /** @dev trigger notification of change in users staked balances
     * @param user            address of user
@@ -80,6 +79,12 @@ contract StakePool is Pausable {
     uint startBal,
     uint finalBal,
     uint request);
+
+  /** @dev trigger notification of earnings to be split
+    * @param earnings uint staking earnings for pool
+    */
+   event NotifyEarnings(uint earnings);
+
 
   /** @dev contract constructor
     * @param _stakeContract the address of the staking contract/mechanism
@@ -171,7 +176,7 @@ contract StakePool is Pausable {
 
     address(sc).transfer(toStake);
 
-    emit NotifyStaked(msg.sender, toStake, block.number);
+    emit NotifyStaked(msg.sender, toStake);
   }
 
   /** @dev unstake funds from stakeContract
@@ -191,14 +196,15 @@ contract StakePool is Pausable {
 
     sc.withdraw(unStake);
 
-    emit NotifyStaked(msg.sender, -unStake, block.number);
+    emit NotifyStaked(msg.sender, -unStake);
   }
 
   /** @dev calculated new stakedBalances
     * @return true if calc is successful, otherwise false
     */
-  function calcNewBalances() external onlyOwner returns (bool) {
+  function calcNewBalances() external onlyOwner {
     uint earnings = address(sc).balance.sub(totalStaked);
+    emit NotifyEarnings(earnings);
     uint ownerProfit = earnings.div(100);
     earnings = earnings.sub(ownerProfit);
 
@@ -207,15 +213,15 @@ contract StakePool is Pausable {
         uint currentBalance = stakedBalances[users[i]];
         stakedBalances[users[i]] =
           currentBalance.add(
-            earnings.mul(99).div(100).mul(currentBalance).div(totalStaked)
+            earnings.mul(currentBalance).div(totalStaked)
           );
         emit NotifyUpdate(users[i], currentBalance, stakedBalances[users[i]]);
       }
+      uint ownerBalancePrior = stakedBalances[owner];
       stakedBalances[owner] = stakedBalances[owner].add(ownerProfit);
+      emit NotifyUpdate(owner, ownerBalancePrior, stakedBalances[owner]);
       totalStaked = address(sc).balance;
-      return true;
     }
-    return false;
   }
 
   /** @dev deposit funds to the contract
@@ -263,7 +269,7 @@ contract StakePool is Pausable {
     uint amount = depositedBalances[msg.sender];
     depositedBalances[msg.sender] = 0;
     requestStake[msg.sender] = requestStake[msg.sender].add(amount);
-    emit NotifyStaked(msg.sender, requestStake[msg.sender], block.number);
+    emit NotifyStaked(msg.sender, requestStake[msg.sender]);
   }
 
   /** @dev user can request to exit at end of current staking period
@@ -272,7 +278,7 @@ contract StakePool is Pausable {
   function requestExitAtEndOfCurrentStakingPeriod(uint amount) external whenNotPaused {
     require(stakedBalances[msg.sender] >= amount);
     requestUnStake[msg.sender] = requestUnStake[msg.sender].add(amount);
-    emit NotifyStaked(msg.sender, requestUnStake[msg.sender], block.number);
+    emit NotifyStaked(msg.sender, requestUnStake[msg.sender]);
   }
 
   /** @dev retreive current state of users funds
