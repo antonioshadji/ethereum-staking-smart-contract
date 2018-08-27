@@ -1,0 +1,37 @@
+{"Name":"src","Hash":"QmbFMke1KXqnYyBBWxB74N4c5SBnJMVAiMNRcGu6x1AwQH","Size":"6"}
+
+17:42 $ ipfs add -r src
+added QmY3HJAhcPgc4A7y4fbBuhCycLmMZkABEP5dFC4D3eM4qR src/browser.test.html
+added QmbKzMKC5CHxLwC2wTSYF4UBuShaunc5VuSS8NqkuTuaue src/css/bootstrap.css
+added QmYzvryLMUPbGdN2hmuUxveSSg19b9CnMr5K4iStaiLYry src/css/bootstrap.css.map
+added QmfBSKjg6R8FDzrtyp93rjBn9wfx5J157uvFiyQxZvyYDx src/css/bootstrap.min.css
+added QmRu84KkUg1UQz1TyHDfNL8pUfGTRDBD2UBC1HDys6w1me src/css/bootstrap.min.css.map
+added QmUXQNEXApaEVoqssrNox1QJ382qTEXK3Z82oLN4NfLNzG src/css/custom.style.css
+added QmVioaS4pc5YSkHC9m7mm6w35pUMeoTwyKkocMNiMGzr8k src/favicon.ico
+added QmXzDK8Ex6JS3q2oUs6PdpArVCpBkcfpgjWrdUXrMz1c4v src/img/DoubleRing-1s-200px.svg
+added QmWsSuXVCXPGej97g1nDRrSh8pVwFeHXwVkuxkpi3xebmT src/img/metamask.png
+added QmRvMWHpRvXnLjfyWUNf5bsWNN4pMqaoQynRsjqzfA6Rhc src/index.html
+added QmUW9TCc1TyxRacqH4oqXfwWmyouftWCknE36qJo452dyW src/js/StakeContract.json
+added QmUJtVXDoTFdtz4HQaYivhJd2K5bfXmwzfYadEZKRThzYu src/js/StakePool.json
+added QmV42ANZ7zSYx7UnyVHihLdyEjz3XX76YamQt3non3wmGf src/js/app.js
+added QmcrSBUtQasCHgTDPZysTRqiXE2jDbQm9sceLw44GX2Hph src/js/bootstrap.bundle.js
+added QmcmrecaVYmqsrJm67xibqmZrhrJZuecWperhHzMwSroWR src/js/bootstrap.bundle.js.map
+added QmZf4ZSsSMMSKsRLpB7Ak1Js6htMJTu6JDBBdNQJJiMaDw src/js/bootstrap.bundle.min.js
+added QmXNJU47qC4qQTbeQnAiaKHtXXtwLUSjYW699bhgBah1Kb src/js/bootstrap.bundle.min.js.map
+added QmbBy786CTmT83wURYH5u1jDqJ5EzGj4C9UHMSqVxUidpZ src/js/browser.test.js
+added QmWmzYYF9dAcqMDqDjCue4ChpDmAexizqqKp6vngYgWjju src/js/jquery-3.3.1.js
+added QmRbr6GPmMaXViCSY6fErfB14WWdCMBESyRzTPdk6VvjDu src/js/jquery-3.3.1.min.js
+added Qmdkr4G7pZn2FauoPVKyce9fLdE7wADvD3mWSnWF89BJYn src/js/jquery-3.3.1.min.map
+added QmXpRdi9KxEY6WNHjc8MeQr1JCntMFYJ74MNdN2cKEV2Tx src/js/server-actions.js
+added QmcXeJq3wMheU4LebXgDvFG7ceo9oGdYEpA7fRFcyfeyEK src/js/truffle-contract.js
+added QmVKYEUaiqyaqFbR9VVBQFA7AdqTn7Sqh9wXKCkaoJXUd3 src/js/truffle-contract.min.js
+added Qmd446NbeXffPdHCCuHc2xoXsHrzj1mV9garFsQMPVuWsh src/js/ui.js
+added QmQkbtpXZEMHV9QwmRdGPa7nLtRBLyKQU1eFrbNBRuNBhS src/js/web3.min.js
+added QmTS4ejQageFEDnbBt4puTnNuB77vT56Zi7F9n35FknR8A src/css
+added QmUNLLsPACCz1vLxQVkXqqLX5R1X345qqfHbsf67hvA3Nn src/fonts
+added QmQt7r3jHFdtj2ow8eU37A9bAgFHjr8gp2Jre761ACGFQJ src/img
+added QmZ4shYjtughgWzZUL3V4nrQ2psH1VRh5aGwc9hnWUW9Gv src/js
+added QmQanC6PBfZxshSMeViJpozNfdG1RUBEoKWocv6aVeq9w5 src
+
+Uploaded from home workstation on 2018-08-27 17:49:01 -0400
+https://gateway.ipfs.io/ipfs/QmQanC6PBfZxshSMeViJpozNfdG1RUBEoKWocv6aVeq9w5/
