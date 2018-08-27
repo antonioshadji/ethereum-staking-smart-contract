@@ -1,0 +1,2 @@
+StakePool: 0x700d80fc1af4050d56fe2b637b47f73ed5ea5c4b
+StakeContract: 0xcb9fec272aa6939852291f6807b3aa1739eb0526

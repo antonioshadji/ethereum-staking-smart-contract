@@ -19,12 +19,14 @@
   "license": "MIT",
   "devDependencies": {
     "chai": "4.1.2",
+    "dotenv": "6.0.0",
     "ganache-cli": "6.1.0-beta.4",
     "local-web-server": "2.6.0",
     "mocha": "5.2.0",
     "webpack": "4.16.3"
   },
   "dependencies": {
+    "truffle-hdwallet-provider": "0.0.6",
     "zeppelin-solidity": "1.11.0"
   }
 }

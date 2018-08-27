@@ -1,3 +1,4 @@
+.env
 .tern-port
 build/
 node_modules/

@@ -1,6 +1,6 @@
 # Staking Pool Smart Contract.
 
-See the [front end hosted on github][3] This will connect to an instance of Ganache running on localhost at port 7545.
+See the [front end hosted on github][3] This will connect to an instance of Ganache running on localhost at port 8545.
 
 Table of Contents:
 * [Overview](#overview)
@@ -72,6 +72,7 @@ In this test setup, the application is running both the client side code and ser
 Automated tests can be run with `npm test` command.
 
 File [./test/full-workflow.js][1] runs the contract through the full application lifecycle.  
+The overall goal in writing these tests was to test each smart contract function in the context in which the front end Dapp will be interacting with the smart contract.  These tests are specifically designed to test the smart contract.  Not the front end code.  For a production application, tests would be conducted using the front end code in addition to web3 direct manipulation.  
 
 1. Verify that both StakePool and StakeContract are starting with 0 ether balance.  
 2. Verify that ether can be deposited by multiple users, including owner account (account[0]).  
