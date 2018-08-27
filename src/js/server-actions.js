@@ -38,7 +38,7 @@ const Srv = {
   },
 
   startTimerNow: function () {
-    Srv.intervalID = window.setInterval(Srv.stakePeriod, 6000)
+    Srv.intervalID = window.setInterval(Srv.stakePeriod, 12000)
   },
 
   stakePeriod: function () {

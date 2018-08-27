@@ -1,6 +1,6 @@
 # Staking Pool Smart Contract.
 
-See the [front end hosted on github][3]
+See the [front end hosted on github][3] This will connect to an instance of Ganache running on localhost at port 7545.
 
 Table of Contents:
 * [Overview](#overview)
@@ -14,7 +14,7 @@ Table of Contents:
 ## Overview
 In the near future, it is expected that Ethereum will move to a Proof of Stake model.  The details are uncertain as to how the process will work.  This staking pool contract is designed to be quickly adapted and launched when the time is right.  It may also serve as a basis for token staking contract such as OMG which is expected to launch a second layer network on top of ethereum.
 
-This contract is designed to be a framework for staking ether as a group.  Since details are few at this time, I have created a dummy contract that will act as the staking contract.  The staking pool contract will manage users deposits and distribution of profits.
+The StakePool contract is designed to be a framework for staking ether as a group.  Since details are few at this time, I have created a dummy contract that will act as the staking contract.  The staking pool contract will manage users deposits and distribution of profits.
 
 There is also a mock StakeContract designed to simulate the operation of the staking mechanism.  This is not meant to be functional except for testing the StakePool contract.
 
@@ -40,32 +40,31 @@ There is also a mock StakeContract designed to simulate the operation of the sta
 [x] Must calculate profit share for each user  
 
 ## Staking Period
-In actual practice the staking period will be set at 24 hours to start.  In this code the staking period is set at 6 seconds for demo purposes.  In addition, to simulate staking earnings, a server process is setup to deposit 0.01 ether into the mock staking contract.  These deposits are taken as the income to be distributed to all the users participating in the pool.  
+In actual practice the staking period will be set at 24 hours to start.  In this code the staking period is set at 12 seconds for demo purposes.  In addition, to simulate staking earnings, a server process is setup to deposit 0.01 ether into the mock staking contract.  These deposits are taken as the income to be distributed to all the users participating in the pool.  
 
 ### Profit share calculation
 Owner fee shall be 1%
-User Profit will be 99% of profits received * User % of pool.
+User Profit will be 99% of profits received times the user's percentage of the total pool.
 
-Every stake/unstake operation will modify the total staked value such that contract always maintains correct balance that is the total staked balance.
+Every stake/unstake operation will modify the total staked value such that contract always maintains correct balance for the total staked balance.
 
-Owner will trigger profit distribution.  
-the formula is:  
-user's share = earnings * 99% * (users stake) / ( total stake)
+In production, the owner will trigger profit distribution on a daily basis. 
 
 ## How to test the StakePool
-1. git clone the repository to your local machine.
+1. Git clone the repository to your local machine.
 `git clone https://github.com/AntoniosHadji/ethereum-staking-smart-contract.git`
-2. change to the project directory.
+2. Change to the project directory.
+2. Run 'npm install' to update the dependencies.  
 3. Start Ganache on the local machine.  
-4. run `npm run migrate` to execute the migration script.  
-4. run `npm run server` to start the development server.  
-5. visit `http://localhost:8000` to see the application.
+4. Run `npm run migrate` to execute the migration script.  In addition to running `truffle migrate`, this script will copy the smart contract JSON to the `src` directory where the front end is expecting it.  
+4. Run `npm run server` to start the development server.  
+5. Visit `http://localhost:8000` to see the application.
 6. If you are already logged into Metamask, the Dapp will pick up your active account and display it in the upper right corner.  If not, login to Metamask and press the Refresh button in the top right corner.
 7. Now the application is ready to use.  Users may:
-    1. deposit or withdraw ether.
-    2. request deposited ether be staked.
-    3. request staked ether be unstaked.
-    4. view accumulated earnings on any staked ether.
+    1. Deposit or withdraw ether.
+    2. Request deposited ether be staked.
+    3. Request staked ether be unstaked.
+    4. View accumulated earnings on any staked ether.
 
 In this test setup, the application is running both the client side code and server side code in the browser.  In production, the server side code would be run from a server controlled by the pool owner, while the client side code can be run from any service that supports html/javascript web apps.
 
