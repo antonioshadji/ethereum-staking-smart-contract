@@ -1,8 +1,15 @@
 # Staking Pool Smart Contract.
 
+See the [front end hosted on github][3]
+
 Table of Contents:
 * [Overview](#overview)
-* [Users functions](#users-functions)
+* [Major functions](#users-functions)
+* [Staking Period](#staking-period)
+* [Profit Distribution](#profit-share-calculation)
+* [How to test the StakePool](#how-to-test-the-stakepool)
+* [Automated Testing](#automated-testing)
+
 
 ## Overview
 In the near future, it is expected that Ethereum will move to a Proof of Stake model.  The details are uncertain as to how the process will work.  This staking pool contract is designed to be quickly adapted and launched when the time is right.  It may also serve as a basis for token staking contract such as OMG which is expected to launch a second layer network on top of ethereum.
@@ -99,3 +106,4 @@ File [./test/full-workflow.js][1] runs the contract through the full application
 
 [1]: https://github.com/AntoniosHadji/ethereum-staking-smart-contract/blob/master/test/full-workflow.js
 [2]: https://github.com/AntoniosHadji/ethereum-staking-smart-contract/blob/master/test/server-functions.js
+[3]: https://www.hadji.co/ethereum-staking-smart-contract/src/

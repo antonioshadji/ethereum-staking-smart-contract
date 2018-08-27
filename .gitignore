@@ -1,5 +1,4 @@
 .tern-port
 build/
 node_modules/
-src/js/*.json
 test/logs/
