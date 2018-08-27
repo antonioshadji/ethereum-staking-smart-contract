@@ -60,6 +60,8 @@ user's share = earnings * 99% * (users stake) / ( total stake)
     3. request staked ether be unstaked.
     4. view accumulated earnings on any staked ether.
 
+In this test setup, the application is running both the client side code and server side code in the browser.  In production, the server side code would be run from a server controlled by the pool owner, while the client side code can be run from any service that supports html/javascript web apps.
+
 ### Automated Testing
 Automated tests can be run with `npm test` command.
 
@@ -67,6 +69,9 @@ File [./test/full-workflow.js][1] runs the contract through the full lifecycle o
 
 
 
+File [./test/server-functions.js][2] runs the contract through the full lifecycle of owner actions.  
+
 
 
 [1]: https://github.com/AntoniosHadji/ethereum-staking-smart-contract/blob/master/test/full-workflow.js
+[2]: https://github.com/AntoniosHadji/ethereum-staking-smart-contract/blob/master/test/server-functions.js
