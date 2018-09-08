@@ -2,4 +2,4 @@
 .tern-port
 build/
 node_modules/
-test/logs/
+test/logs/*
